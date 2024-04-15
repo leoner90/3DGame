@@ -2,6 +2,7 @@
 #include "headers/Cutscene.h"
 #include "headers/UIDialogBox.h"
 #include "headers/Player/Player.h"
+#include "headers/Enemy.h"
 
 Cutscene::Cutscene(float w, float h)
 {
@@ -44,24 +45,33 @@ void Cutscene::init(float w, float h, Player& player)
 	cutcceneCameraPosition = CVector(0, 0, 0);
 }
 
-void Cutscene::Update(Uint32 t, UIDialogBox& dialogBox)
+void Cutscene::Update(Uint32 t, std::vector<Enemy*>& AIPlayers)
 {
-	localDialogBox = &dialogBox;
-	
-	localTime = t;
-	if (curentCutSceneNum == 0)
-	{
  
+	localAllAIPlayers = AIPlayers;
+
+	localTime = t;
+	if (curentCutSceneNum == 1)
+	{
 		cutSceneOne();
-		
 	}
 	
-	if (curentCutSceneNum == 1)
+	else if (curentCutSceneNum == 2)
 	{
 		localPlayer->playerModel.Update(localTime);
 		particleList.Update(localTime);
 		particleList.delete_if(true);
 		cutSceneTwo();	
+	}
+
+	else if (curentCutSceneNum == 3)
+	{
+		cutSceneThree();
+	}
+
+	else if (curentCutSceneNum == 4)
+	{
+		cutSceneFour();
 	}
 
 }
@@ -101,26 +111,11 @@ void Cutscene::cutSceneOne()
 		dialogNumber = 9;
 	}
 
-
-
-
  
-	if (dialogSwitcherTimer < localTime && dialogNumber == 9)
-		dialogNumber++;
-	
-
-
-
-
-	if (dialogNumber == 10)
-	{
-		dialogNumber++;
-	}
-
-
+	if (dialogSwitcherTimer < localTime && dialogNumber == 9) 	dialogNumber++;
+	if (dialogNumber == 10) dialogNumber++;
 	if (dialogNumber == 11 && isCutscenePlaying)
 	{
-	
 		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
 		blackScreenTimer += 2;
 		darkTransition.SetAlpha(blackScreenTimer);
@@ -138,6 +133,50 @@ void Cutscene::cutSceneOne()
 
 void Cutscene::cutSceneTwo()
 {
+	//cutSceneOne();
+	camerRotationAngle = 0.15;
+
+	for (auto AIPlayer : localAllAIPlayers)
+	{
+		if (AIPlayer->isFriend)
+		{
+			//AIPlayer->enemyModel->SetPositionV(CVector(300, 0, 500));
+			cutcceneCameraPosition = AIPlayer->enemyModel->GetPositionV();
+	
+			AIPlayer->showBox(1, 1, 1, 20000);
+		}
+	
+	}
+
+
+
+
+	if (dialogNumber == 10)
+	{
+		dialogNumber++;
+	}
+
+
+	if (dialogNumber == 11 && isCutscenePlaying)
+	{
+
+		for (auto AIPlayer : localAllAIPlayers) if (AIPlayer->isFriend) 	AIPlayer->hideBox();
+	 
+
+		
+		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
+		blackScreenTimer += 2;
+		darkTransition.SetAlpha(blackScreenTimer);
+	}
+
+
+	if (blackScreenTimer >= 100)
+	{
+		isCutscenePlaying = false;
+	}
+
+
+	/*
 	if (!cutsceneTwoStarted)
 	{
 		localPlayer->playerModel.SetPosition(1500, 0, 1500);
@@ -173,8 +212,18 @@ void Cutscene::cutSceneTwo()
 		particleList.delete_all();
 	}
 
-	cutcceneCameraPosition = CVector(localPlayer->playerModel.GetX() - 300, localPlayer->playerModel.GetY() + 600 , localPlayer->playerModel.GetZ());
+	cutcceneCameraPosition = CVector(localPlayer->playerModel.GetX() - 300, localPlayer->playerModel.GetY() + 600 , localPlayer->playerModel.GetZ());*/
  
+}
+
+void Cutscene::cutSceneThree()
+{
+	cutSceneOne();
+}
+
+void Cutscene::cutSceneFour()
+{
+	cutSceneOne();
 }
 
 

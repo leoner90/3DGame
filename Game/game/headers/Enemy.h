@@ -8,20 +8,20 @@ class Map;
 class Enemy : public UIDialogBox
 {
 public:
- 
- 
 	~Enemy();
 	
 	//main Functions
-	void init(int index, int enemyType, Map& map, CModelMd3& enemyModel);
+	void init(int index, int enemyType, Map& map, CModelMd3& enemyModel, int curentGameLevel);
 	void OnUpdate(Uint32 t, Player& player, Map& map, std::vector<Enemy*>& AllEnemies, CVector enemypos);
 	void OnDraw(CGraphics* g, CVector enemyPos);
 
 	void Attack();
 	void OnRender3D(CGraphics* g);
-	void EnemyGetDamage(float damage, CModel Vfx);
+	//CModel Vfx)
+	void EnemyGetDamage(float damage);
 	void EnemyControl();
 	void ShotsHandler();
+	void initDialogues();
 	CModelMd3* enemyModel;
 
 	//TO DO GETTERS
@@ -31,6 +31,7 @@ public:
 	bool isFriend;
 	bool IsInLineOfSight;
 private:
+	
 	//local
 	Player* localPlayer;
 	Map* localMap;
@@ -38,11 +39,12 @@ private:
 	Uint32 localTime;
 	int localEnemyType;
 	int localEnemyIndex;
+	int localGameLvl;
 
 	CModelList onHitEffect;
-	CModel Vfx;
+ 
 	CSoundPlayer deathSound;
-
+	CModel onHitEffectModel;
 	Uint32 deathAnimationTimer;
 	CHealthBar enemyHpbar;
 
@@ -53,7 +55,7 @@ private:
 	//enemy stats
 	float enemySpeed;
 	float enemyMaxHp, enemyCurrentHp;
-
+	bool onStartOfTheLevel;
 	
 
 	//Change Pos Timer
@@ -62,8 +64,7 @@ private:
 	//Attack / Hide timer
 	float AttackHideTimer;
 
- 
-	//CVector* entityAllPos;
+
 	vector<CVector > entityAllPos;
 
 	CVector currentDestinationPoint;
@@ -71,8 +72,8 @@ private:
 	CVector lastFramePos;
 
 	int curentPosNum;
-
 	CModelList snowBallList;
 	CModel bullet;
+	CSprite hearthHP;
 
 };

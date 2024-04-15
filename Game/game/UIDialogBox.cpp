@@ -8,21 +8,27 @@ UIDialogBox::UIDialogBox()
 { 
 	font.LoadDefault();
 	dialogBoxBg.LoadImage("dialogBox3.png");
-	dialogBoxBg.SetSize(150, 100);
+	dialogBoxBg.SetSize(490, 345);
  
 	isBoxShowen = false;
 	hideInSec = 0;
 	//DIALOGS
-	name[MYNE] = "Myne";
-	name[BLINKY] = "Blinky";
+	name[0] = "Andreas";
+	name[1] = "Victor";
+	name[2] = "Jarek";
+	name[3] = "Shinma";
+	name[4] = "Leo"; // Player
+	name[5] = "Light"; // Friend
+ 
+
 	//cutscene 1
-	text[0] = "How much longer\n, Blinky? This is\n taking forever. ";
-	text[1] = "expl";
+	text[0] = "Are you ready \nto eat snow. \nDon't cry later";
+	text[1] = "We Will Win \nWe are the best! \nYes My Friend?";
 	text[2] = "What Was that?????";
 	text[3] = "Myne, somethings-\n hap- can’t- repon-\n shutting- dow-";
 	text[4] = "Blinky?\n Hey!\n Blinky!";
 	text[5] = "The ship control is \nnon-responsive, \nwhat the hell? What is going on? ";
-	text[6] = "Myne- They’re- \nNot- Help-";
+	text[6] = "How much longer\n, Blinky? This is\n taking forever. ";
 }
 
 void UIDialogBox::OnUpdate(long t, CVector position)
@@ -39,7 +45,7 @@ void UIDialogBox::OnUpdate(long t, CVector position)
 		
 	}
 
-	dialogBoxBg.SetPosition(position.GetX(), position.GetY() + 140);
+	dialogBoxBg.SetPosition(position.GetX() + 60, position.GetY() + 60);
 	
 }
 
@@ -49,8 +55,8 @@ void UIDialogBox::OnDraw(CGraphics* g)
 	{
 		dialogBoxBg.Draw(g);
 		//text
-	
-		TextConverter::splitTextToLines(text[dialogNumber], dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 20, 20);
+		font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35 , name[speaker], CColor::DarkRed(), 18);
+		TextConverter::splitTextToLines(text[dialogNumber], dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 15, 18);
 	}
 }
 

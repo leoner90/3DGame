@@ -94,9 +94,21 @@ Map::Map()
 	}
 }
 
-void Map::init()
+void Map::init(int level)
 {
+	collidingObjects.clear();
+	collidingObjects.delete_if(true);
+	mapCollision.delete_all();
+	mapCollision.delete_if(true);
+	modelList.delete_all();
+	modelList.delete_if(true);
+
+	gameLevel = level;
 	LoadData();
+ 
+
+
+
 }
 
 void Map::LoadData()
@@ -108,8 +120,14 @@ void Map::LoadData()
 	// move gameworld so that it starts at 0,0 and extends in positive xz-direction
 	//floor.SetPosition(floor.GetWidth() / 2, floor.GetDepth() / 2);
 
+	
+
+	//GAME LVL MAP
 	fstream myfile;
-	myfile.open("level1.txt", ios_base::in);
+	if(gameLevel == 1) myfile.open("level1.txt", ios_base::in);
+	else if (gameLevel == 2) myfile.open("level2.txt", ios_base::in);
+	else if (gameLevel == 3) myfile.open("level3.txt", ios_base::in);
+
 	int type, x, y, z, rot;
 	bool neof; // not end of file
 	do
@@ -240,8 +258,6 @@ void Map::OnUpdate(Uint32 t, Player& player)
 	localPlayer = &player;
 	weather();
 	modelList.Update(t);
-
-
 }
 
 void Map::OnDraw(CGraphics* g) {   }
@@ -253,7 +269,6 @@ void Map::OnRender3D(CGraphics* g)
 	collidingObjects.Draw(g);
 	floor.Draw(g);
 	modelList.Draw(g);
- 
 	rain.Draw(g);
 }
 

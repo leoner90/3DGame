@@ -9,13 +9,15 @@ public:
 	
 	//Main Functions
 	void init(float w, float h, Player& player);
-	void Update(Uint32 t, UIDialogBox& dialogBox);
+	void Update(Uint32 t, std::vector<Enemy*>& AIPlayers);
 	void Draw2d(CGraphics* g);
 	void Draw3d(CGraphics* g);
 
 	//Cutscenes
 	void cutSceneOne();
 	void cutSceneTwo();
+	void cutSceneThree();
+	void cutSceneFour();
 	void startCutscene(int sceneNum);
 
 
@@ -29,7 +31,7 @@ public:
 
 private:
 	enum Cutsenes { START, END };
-
+	std::vector<Enemy*> localAllAIPlayers;
  
  
 	CSprite screenEdges, darkTransition;

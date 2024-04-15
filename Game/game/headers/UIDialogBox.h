@@ -29,7 +29,7 @@ private:
 	float localW, localH;
 
 	int dialogNumber, dialogEndNumber;
-	std::string text[27], name[2];
+	std::string text[27], name[6];
 	
 	CFont font;
 

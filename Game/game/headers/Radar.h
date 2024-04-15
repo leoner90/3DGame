@@ -16,7 +16,7 @@ public:
 private:
 	void DrawDot(float posX, float posZ, CColor color, CGraphics* g);
 
-	CSprite radarBg;
+	CSprite radarBg, radarCover;
 	CSprite dot;
 	CSpriteList dotList;
 

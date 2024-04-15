@@ -6,7 +6,7 @@ class Map
 public:
 	Map();
 	//Main Functions
-	void init();
+	void init(int level);
 	void OnUpdate(Uint32 t, Player& player);
 	void OnDraw(CGraphics* g);
 	void OnRender3D(CGraphics* g);
@@ -23,4 +23,5 @@ private:
 	CModelList modelList, rain;
 	CFont font;
 	Player* localPlayer;
+	int gameLevel;
 };

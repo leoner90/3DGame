@@ -43,7 +43,7 @@ void LoadingScreen::init()
 
 void LoadingScreen::Update(Uint32 t)
 {
-	if (loadingTimer == 0 && loadingStarted) loadingTimer = t + 3000;
+	if (loadingTimer == 0 && loadingStarted) loadingTimer = t + 1000;
 	if (loadingTimer < t && loadingStarted) loadingCompleted = true;
 
 	loadingProgress = 100 - ( (loadingTimer - t) / 4000 * 100);

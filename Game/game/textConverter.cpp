@@ -19,7 +19,7 @@ void TextConverter::splitTextToLines(string text, float xpos, float ypos, int fo
 	{
 		float lineHeight = 0;
 		while (getline(ss, to, '\n')) {
-			font.DrawText(xpos, ypos - lineHeight, to, CColor::Red(), fonSize);
+			font.DrawText(xpos, ypos - lineHeight, to, CColor::DarkBlue(), fonSize);
 			lineHeight += fonSize + 2;
 		}
 	}

@@ -12,7 +12,7 @@ public:
 	Player();
 
 	//Main Functions
-	void init();
+	void init(int curentGameLevel);
 	void OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos);
 	void OnDraw(CGraphics* g, UIDialogBox& dialogBox);
 	void OnRender3D(CGraphics* g);
@@ -29,7 +29,9 @@ public:
 	//Loots
 	void addLoot();
 	void lootHandler();
-
+	//buff
+	void buffHandler();
+	
 	//shots
 	void playerShotsHandler();
 	void performShot();
@@ -48,15 +50,15 @@ public:
 
 	CModelMd3 playerModel;
 
-	//baff
-	int armorComponents, weaponComponents, bossLoot;
 
 	//death handler
 	bool isPlayerDead;
 	bool playerPreDeahAnimation;
 
-	//Health , Enerrgy, Armor
+	//Lives
 	float playerMaxHp, playerCurrentHp;
+
+	int chargePercent;
 
 	//shooting
 	float playerDamage, chargedDamage;
@@ -66,6 +68,14 @@ public:
 	float dashCoolDown;
 	bool isPlayerInDash;
 	bool isFriend;
+
+	//buffs
+	bool isPlayerInvulnerable, isPlayerUnderDistanceBuff;
+	float InvulnerableBuffTimer, distanceBuffTimer;
+	float rangeBuffModifer ;
+
+
+	bool isPlayerInDamage;
 private:
 	//Fonts
 	CFont font;
@@ -82,8 +92,6 @@ private:
 	CVector* localMouse;
 
 	//player Shots 
-	CHealthBar ShotChargeBar; 
-	float ShotChargeBarOffset;
 	CModelList playerShots;
 	CModel bullet;
 
@@ -104,6 +112,7 @@ private:
 
 	//Charget Shot
 	bool chargedShot, isShotCharged;
+	float fullyChargargedShotRange;
 	float startChargedShotTimer;
 	float totalTimeToCharge;
 
@@ -111,7 +120,7 @@ private:
 	float dashTimer;
 
 	//Hit Stan
-	bool isPlayerInDamage;
+	
 	float InDamageStunDelayTimer, repeatStunDelayTimer;
 	float rangeOfAttack;
 

@@ -56,8 +56,6 @@ private:
 
 	//Mouse Control
 	void OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLeft, bool bRight, bool bMiddle);
-	void OnWheelUp(Uint16 x, Uint16 y);
-	void OnWheelDown(Uint16 x, Uint16 y);
 
 	// Keyboard Event Handlers
 	virtual void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
@@ -90,7 +88,8 @@ private:
 
 	bool cameraMovement;
 
-	CVector currentMousePos;
+	CVector currentMousePosToScreen, currentMousePos;
+ 
 	CVector cameraControlMouseInitPose;
 	CSprite mousePointer;
 	CModel skydome;
@@ -99,7 +98,7 @@ private:
 
 	float localH, localW;
 
-
+	int curentGameLevel;
 	//Static
 	CModelMd3* enemyModelOne;
 	CModelMd3* enemyModelTwo;

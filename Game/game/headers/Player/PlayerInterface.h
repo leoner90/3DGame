@@ -17,14 +17,14 @@ private:
 	CFont font;
 	Player* localPlayer;
 	float localH, localW;
-	CSprite weaponComponent, armorComponent, bossComponent;
-
-	float skillBarY;
+	CSprite hpHeart, hearthBg, chargedShotBarBG;
 	float localTime;
+	float hitEffectTimer;
 
-
-	CHealthBar hbar, energyBar, armorBar;
-	CSprite skillBar, sprintSkillLogoOn, sprintSkillLogoOff, callbackSkillIcon, mainEnergyUI;
+	CHealthBar  chargedShotBar;
+	CSprite  sprintSkillLogoOn, sprintSkillLogoOff;
+	CSprite InvulnerableBuffLogo, distanceBuffLogo;
+	CSprite hitEffectBg;
 };
 
  
