@@ -1,4 +1,5 @@
 #pragma once
+#include "headers/UIDialogBox.h"
 
 //Forwarding Classes
 class Map;
@@ -6,14 +7,14 @@ class Enemy;
 class UIDialogBox;
 class Shop;
 
-class Player 
+class Player : public UIDialogBox
 {
 public:
 	Player();
 
 	//Main Functions
 	void init(int curentGameLevel);
-	void OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos);
+	void OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos, float cameraYrot);
 	void OnDraw(CGraphics* g, UIDialogBox& dialogBox);
 	void OnRender3D(CGraphics* g);
 
@@ -39,8 +40,6 @@ public:
 	//Mouse And Keyboard Controll
 	void OnRButtonDown(long t);
 	void OnRButtonUp();
-	void OnMouseMove(CVector currentMousePos);
-	void OnLButtonDown(CVector pos, CVector currentMousePos, long t);
 	void OnKeyDown(SDLKey sym, CVector currentMousePos);
 	
 	//GETTERS
@@ -74,6 +73,8 @@ public:
 	float InvulnerableBuffTimer, distanceBuffTimer;
 	float rangeBuffModifer ;
 
+	enum playerStates { UNOCCUPIED, INATTACK, INDASH, INDAMAGE, CUTSCENE };
+	playerStates playerCurrentState;
 
 	bool isPlayerInDamage;
 private:
@@ -81,13 +82,13 @@ private:
 	CFont font;
 
 	//Player States
-	enum playerStates { UNOCCUPIED, INATTACK, INDASH, INDAMAGE };
-	playerStates playerCurrentState;
+	
 	playerStates savedPrevPlayerState;
 
 	//local variables - mirroring
 	long localTime;
 	Map* localMap;
+	float localcameraYrot;
 	std::vector<Enemy*> localEnemies;
 	CVector* localMouse;
 
@@ -139,5 +140,5 @@ private:
 	CModelList lootList;
 	float randomLootTimer;
 	int lootTimerOffset;
-
+	bool chargingAnimation;
 };

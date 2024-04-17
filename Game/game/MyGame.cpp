@@ -15,6 +15,7 @@ CMyGame::CMyGame()
 //*************** INIT ***************
 void CMyGame::OnInitialize()
 {
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
 	HideMouse();
 	cameraMovement = false;
 	currentMenuState = MAIN_MENU;
@@ -36,7 +37,7 @@ void CMyGame::OnInitialize()
 
 	//music
 	mainBgMusic.Play("mainBg.wav", -1);
-	mainBgMusic.SetVolume(15);
+	mainBgMusic.SetVolume(11);
 
 	//StartScreen Models
 	InitSpritesAndModels();
@@ -47,22 +48,27 @@ void CMyGame::OnInitialize()
 
 	
 	//enemies
-	enemyModelOne = new CModelMd3();
-	enemyModelTwo = new CModelMd3();
-	boss = new CModelMd3();
-	enemyModelOne->LoadModel("enemies/Bully.md3");
-	//enemyModelOne->LoadTexture("enemies/mon01.png");
-	enemyModelOne->SetScale(21.2f);
+	AIPlayerModelOne = new CModelMd3();
+	AIPlayerModelTwo = new CModelMd3();
 
-	enemyModelTwo->LoadModel("enemies/Bully.md3");
-	enemyModelTwo->SetScale(21.2f);
-	//enemyModelTwo->LoadTexture("enemies/65.png");
+	boss = new CModelMd3();
+	AIPlayerModelOne->LoadModel("enemies/lacky.md3");
+	AIPlayerModelOne->LoadTexture("enemies/lacky.png");
+	AIPlayerModelOne->SetScale(1.2f);
+
+	AIPlayerModelTwo->LoadModel("enemies/lacky.md3");
+	AIPlayerModelTwo->LoadTexture("enemies/lackyFriend.png");
+	AIPlayerModelTwo->SetScale(1.2f);
+
+ 
 
 	boss->LoadModel("enemies/Bully.md3");
-	boss->SetScale(22.2f);
-	//boss->LoadTexture("enemies/boss2.png");
+	boss->SetScale(15.2f);
+	boss->LoadTexture("enemies/Bully.png");
 
 	curentGameLevel = 1;
+	mousePointer.SetPosition(localW / 2, localH / 2 + 300);
+
 }
 
 
@@ -71,17 +77,18 @@ void CMyGame::OnInitialize()
 void CMyGame::OnStartLevel(int level)
 {
 	//Main inits
-	map->init(level);
+	int mapLevel = level;
+	if (level == 4) mapLevel = 3; // just to show map on final cutscene
+	map->init(mapLevel);
 	playerInterface->init(localW, localH); 
 	radar->init();
-	cutscene->init(localW, localH, *player);  
-	player->init(level);
+	player->init(mapLevel);
  
 	//resets
 	gameStarted = false;
 	SetGameMode(MODE_PAUSED);
 	deathScreenTimer = 0;
-	//isBossSpawn = false;
+ 
 	rainBgEffect.Pause();
 
 	//****ENEMIES clear
@@ -90,13 +97,16 @@ void CMyGame::OnStartLevel(int level)
 
 	// spawn
 	enemySpawn(level);
+	cutscene->init(localW, localH, *player);
+
 }
 
 //*************** UPDATE ***************
 void CMyGame::OnUpdate() 
 {
+ 
 	Uint32 t = (float)GetTime();
-	currentMousePosToScreen = ScreenToFloorCoordinate(currentMousePos.GetX(), currentMousePos.GetZ());
+	currentMousePosToScreen = ScreenToFloorCoordinate(mousePointer.GetX(), mousePointer.GetY());
 
 	//end Of the game Win
 	if (cutscene->curentCutSceneNum == 4 && !cutscene->isCutscenePlaying)
@@ -113,21 +123,23 @@ void CMyGame::OnUpdate()
 		currentMenuState = IN_GAME;
 		camera.rotation.y = YcameraInitRotation;
 		camera.position.z = 2000;
-		rainBgEffect.Play("rain.wav", -1);
-		rainBgEffect.SetVolume(60);
+		rainBgEffect.Play("weather.wav", -1);
 		for (auto AIPlayer : AIPlayers) AIPlayer->OnSpawnHold = false;
 	}
 
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
 		map->OnUpdate(t, *player);
+		CVector playerWorldPos = player->playerModel.GetPositionV() + CVector(0, player->playerModel.GetTop(), 0);
+		player->OnUpdate(t, false, false, false, false, *map, AIPlayers, currentMousePosToScreen, WorldToScreenCoordinate(playerWorldPos), 0);
 		bool fullWidth = true;
-		cutscene->Update(t, AIPlayers);
+		
 		for (auto AiPlayer : AIPlayers)
 		{
 			CVector AiPlayerpos = AiPlayer->enemyModel->GetPositionV() + CVector(0, AiPlayer->enemyModel->GetTop(), 0);
 			AiPlayer->OnUpdate(GetTime(), *player, *map, AIPlayers, WorldToScreenCoordinate(AiPlayerpos));
 		}
+		cutscene->Update(t, AIPlayers);
 		return;
 	}
 
@@ -154,7 +166,7 @@ void CMyGame::OnUpdate()
 	
 	//Objects updates
 	map->OnUpdate(t, *player);
-	player->OnUpdate(t, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), IsKeyDown(SDLK_w), IsKeyDown(SDLK_s), *map, AIPlayers, currentMousePosToScreen, WorldToScreenCoordinate(player->playerModel.GetPositionV()));
+	player->OnUpdate(t, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), IsKeyDown(SDLK_w), IsKeyDown(SDLK_s), *map, AIPlayers, currentMousePosToScreen, WorldToScreenCoordinate(player->playerModel.GetPositionV()), camera.rotation.y);
 	playerInterface->OnUpdate(t, *player, *dialogBox);
 	radar->OnUpdate(t, AIPlayers, *player, *map);
 	
@@ -186,6 +198,8 @@ void CMyGame::OnUpdate()
 		cutscene->startCutscene(curentGameLevel);
 		currentMenuState = CUTSCENE;
 	}
+
+
 }
 
 //*************** 2D RENDER ***************
@@ -203,15 +217,12 @@ void CMyGame::OnDraw(CGraphics* g)
 	// CUTSCENE
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
-		cutscene->Draw2d(g);
-		//dialogBox->OnDraw(g);
+		cutscene->Draw2d(g); 
 		
-		for (auto AIPlayer : AIPlayers)
-		{
-		//	CVector AiPlayerpos = AIPlayer->enemyModel->GetPositionV() + CVector(0, AIPlayer->enemyModel->GetTop(), 0);
-			AIPlayer->OnDraw(g, WorldToScreenCoordinate(AIPlayer->enemyModel->GetPositionV()));
-		}
+		for (auto AIPlayer : AIPlayers) AIPlayer->OnDraw(g);
+ 
 		map->OnDraw(g);
+		player->OnDraw(g, *dialogBox);
 		return;
 	}
 
@@ -223,13 +234,10 @@ void CMyGame::OnDraw(CGraphics* g)
 	radar->OnDraw(g);
 	playerInterface->OnDraw(g);
 
-	for (auto AIPlayer : AIPlayers)
-	{
-		AIPlayer->OnDraw(g, WorldToScreenCoordinate(AIPlayer->enemyModel->GetPositionV()));
-	}
-
-	font.DrawNumber((float)Width / 2 - 40.f, (float)Height / 2 - 160, player->playerModel.GetX() , mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
-	font.DrawNumber((float)Width / 2 - 40.f, (float)Height / 2 - 300, player->playerModel.GetZ(), mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
+	for (auto AIPlayer : AIPlayers) AIPlayer->OnDraw(g);
+ 
+	//font.DrawNumber((float)Width / 2 - 40.f, (float)Height / 2 - 160, player->playerModel.GetX() , mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
+	//font.DrawNumber((float)Width / 2 - 40.f, (float)Height / 2 - 300, player->playerModel.GetZ(), mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
 }
 
 //*************** 3D RENDER ***************
@@ -249,14 +257,13 @@ void CMyGame::OnRender3D(CGraphics* g)
 void CMyGame::CameraControl(CGraphics* g)
 {
 	// ------ Global Transformation Functions -----
-	glScalef(world.scale, world.scale, world.scale);  // scale the game world
-	glTranslatef(world.position.x, world.position.y, world.position.z);  // translate game world
+	//glScalef(world.scale, world.scale, world.scale);  // scale the game world
+	//glTranslatef(world.position.x, world.position.y, world.position.z);  // translate game world
 
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
-		//zzzzz
-		glTranslatef(0, 0, cutscene->cutcceneCameraPosition.GetZ());
-		glRotatef(50, 1, 0, 0);	// rotate game world around x-axis
+		glTranslatef(0, 0, cutscene->cutcceneCameraPosition.GetZ() + cutscene->cameraOffset);		//zzzzz
+		glRotatef(cutscene->xWorldRotation, 1, 0, 0);	// rotate game world around x-axis // change
 	}
 	else
 	{
@@ -266,13 +273,17 @@ void CMyGame::CameraControl(CGraphics* g)
 	
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
-		camera.rotation.y -= cutscene->camerRotationAngle;
+		if(curentGameLevel == 1) camera.rotation.y -= cutscene->camerRotationAngle;
+		if (curentGameLevel != 1) camera.rotation.y = cutscene->camerRotationAngle;
 		glRotatef(camera.rotation.y, 0, 1, 0);	// rotate game world around x-axis
 	}
 	else  glRotatef(camera.rotation.y, 0, 1, 0);	// rotate game world around x-axis
 	
-	if (currentMenuState == CUTSCENE && gameStarted ) glTranslatef(0, -cutscene->cutcceneCameraPosition.GetY() - camera.position.y ,  0);
-	else glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 		//glTranslatef(0, -player->playerModel.GetY() - camera.position.y, 0);
+
+
+	if (currentMenuState == CUTSCENE && gameStarted ) glTranslatef(0, -cutscene->cutcceneCameraPosition.GetY() - 800 ,  0);
+	else  //glTranslatef(0, -player->playerModel.GetY() + 0 - camera.position.y, 0);
+		glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 	
 		
    // it makes the skydome stationary / draw the skydome before game world is translated
 	skydome.Draw(g);
@@ -284,9 +295,6 @@ void CMyGame::CameraControl(CGraphics* g)
 	UpdateView();
 	Light.Apply();
 
-	//camera Zoom
-	if (IsKeyDown(SDLK_KP_PLUS))  if (camera.position.z < 2000) camera.position.z += 20;  // camera distance
-	if (IsKeyDown(SDLK_KP_MINUS)) if (camera.position.z > 0)camera.position.z -= 20;  // camera distance
 }
 
 
@@ -367,51 +375,47 @@ void CMyGame::enemySpawn(int level)
 	enum allEnemiesTypes { AIEnemy, AIFriend, BOSS };
 	if (level == 1)
 	{
-	
-
 		//Enemy Teams
 		for (int enemyIndex = 0; enemyIndex < 3; enemyIndex++)
 		{
 			AIPlayers.push_back(new Enemy());
-			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *enemyModelOne, curentGameLevel);
+			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
 		}
 		
 		//Friend Team
 		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIFriend, *map, *enemyModelTwo, curentGameLevel);
+		AIPlayers.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
 	}
 
 	if ( level == 2)
 	{
-
 		//Enemy Teams 2 regular enemies + boss
 		for (int enemyIndex = 0; enemyIndex < 2; enemyIndex++)
 		{
 			AIPlayers.push_back(new Enemy());
-			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *enemyModelOne, curentGameLevel);
+			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
 		}
 		//boss
 		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(2, AIEnemy, *map, *boss, curentGameLevel);
+		AIPlayers.back()->init(2, BOSS, *map, *boss, curentGameLevel);
 	 
 	
 
 		//Friend Team
 		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIFriend, *map, *enemyModelTwo, curentGameLevel);
+		AIPlayers.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
 	}
 
 
 	if (level == 3)
 	{
-
 		//Enemy Teams 2 regular enemies + boss
 		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIEnemy, *map, *enemyModelOne, curentGameLevel);
+		AIPlayers.back()->init(0, AIEnemy, *map, *AIPlayerModelTwo, curentGameLevel);
 
 		//boss
 		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(1, AIEnemy, *map, *boss, curentGameLevel);
+		AIPlayers.back()->init(1, BOSS, *map, *boss, curentGameLevel);
 	}
 
 }
@@ -420,19 +424,13 @@ void CMyGame::enemySpawn(int level)
 void CMyGame::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 {
 	//Player KeyBoard Controller
-	if (!IsPaused()) player->OnKeyDown(sym, currentMousePosToScreen);
+	if (!player->playerPreDeahAnimation && currentMenuState == IN_GAME) player->OnKeyDown(sym, currentMousePosToScreen);
 
 	//Start
 	MainMenuController(sym);
 }
 
-void CMyGame::OnLButtonDown(Uint16 x, Uint16 y)
-{
-	//player Left Btn
-	if (!IsPaused() && currentMenuState == IN_GAME)
-		player->OnLButtonDown(ScreenToFloorCoordinate(x, y), currentMousePosToScreen, GetTime());
-}
-
+ 
 
 void CMyGame::MainMenuController(SDLKey sym)
 {
@@ -462,8 +460,6 @@ void CMyGame::MainMenuController(SDLKey sym)
 	//LOADING COMPLETED
 	if (sym == 13 && currentMenuState == LOADING_SCREEN && loadingScreen->loadingCompleted)
 	{
-		//OnStartLevel(1);
-	
 		StartGame();
 		gameStarted = true;
 		cutscene->startCutscene(curentGameLevel); 
@@ -518,9 +514,7 @@ void CMyGame::MainMenuController(SDLKey sym)
 
 void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLeft, bool bRight, bool bMiddle)
 {
-	
-
-	if (y < localH / 2 + 100)
+	 if (y < localH / 2 + 100)
 	{
 		mousePointer.SetPosition(x, localH / 2 + 120);
 		currentMousePos = CVector{ (float)x, 0 ,(float)localH / 2 + 120 };
@@ -535,13 +529,37 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 	{
 		mousePointer.SetPosition(x, y);
 		currentMousePos = CVector{ (float)x, 0 ,(float)y };
-	}
+	} 
 
-	//player rotation to mouse pos
-	if (currentMenuState == IN_GAME && !player->playerPreDeahAnimation) player->OnMouseMove(currentMousePosToScreen);
-
+	 
  
 
+
+	/*
+	float sensitivity = 0.07f;
+
+	static float avgrelx = 0;
+	static float avgrely = 0;
+
+	if (currentMenuState != IN_GAME) return;
+	// weighted everage between past and current values
+	avgrelx = 0.75 * avgrelx + 0.25 * (float)relx;
+	avgrely = 0.75 * avgrely + 0.25 * (float)rely;
+
+ 
+ 
+	player->playerModel.Rotate(-sensitivity * avgrelx); player->playerModel.SetDirection(player->playerModel.GetRotation());
+ 
+	camera.rotation.y += sensitivity * avgrelx;
+
+	// tilting/pitching of the game world
+	camera.rotation.x += -sensitivity * avgrely;
+	if (camera.rotation.x < 0) camera.rotation.x = 0;
+	if (camera.rotation.x > 80) camera.rotation.x = 80;
+
+	if (camera.rotation.y > 360 || camera.rotation.y < -360) camera.rotation.y = 0;
+
+	*/
 }
 
 
@@ -562,10 +580,10 @@ void CMyGame::OnMButtonUp(Uint16 x, Uint16 y)
 
 void CMyGame::OnRButtonDown(Uint16 x, Uint16 y)
 {
-	player->OnRButtonDown(GetTime());
+	if(!player->playerPreDeahAnimation && currentMenuState == IN_GAME) player->OnRButtonDown(GetTime());
 }
 
 void CMyGame::OnRButtonUp(Uint16 x, Uint16 y)
 {
-	player->OnRButtonUp();
+	if (!player->playerPreDeahAnimation && currentMenuState == IN_GAME) player->OnRButtonUp();
 }

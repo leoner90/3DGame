@@ -13,11 +13,7 @@ Enemy::~Enemy()
 
 void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int curentGameLevel)
 {
-	//Shooting TO DO
-	bullet.LoadModel("bullet/Bullet2.obj");
-	bullet.SetScale(8.f);
-	onStartOfTheLevel = true;
-
+	onStartOfTheLevel = onStartOfTheLevel2 = true;
 	localEnemyIndex = index;
 	localGameLvl = curentGameLevel;
 	AttackHideTimer = 0;
@@ -27,13 +23,15 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 	IsInLineOfSight = false;
 	curentPosNum = 0;
 
-	//hp
-	hearthHP.LoadImage("lifeHeart.png");
-	hearthHP.SetSize(15, 15);
 
 	//points 
  
 	entityAllPos.clear();
+	snowBallSize = 8.f;
+	enemyDamage = 1;
+	enemyMaxHp = enemyCurrentHp = 3;
+	enemySpeed = 350;
+
 	if (localEnemyType == 0 || localEnemyType == 2)
 	{
 		if (localGameLvl == 1)
@@ -76,12 +74,16 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 				entityAllPos.push_back(CVector(-934, 100, -2057));
 				entityAllPos.push_back(CVector(-1902, 100, -345));
 			}
-			if (localEnemyIndex == 2) // enemy 3 pos
+			if (localEnemyIndex == 2) // enemy 3  BOSS
 			{
 				entityAllPos.push_back(CVector(-1156, 100, -521));
 				entityAllPos.push_back(CVector(-320, 100, 1182));
 				entityAllPos.push_back(CVector(378, 100, 2453));
 				entityAllPos.push_back(CVector(-1156, 100, -521));
+
+				enemyDamage = 2;
+				snowBallSize = 25.f;
+	
 			}
 		}
 
@@ -100,35 +102,13 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 				entityAllPos.push_back(CVector(-1777, 100, -1720));
 				entityAllPos.push_back(CVector(-1673, 100, -11));
 				entityAllPos.push_back(CVector(-1777, 100, -1720));
+
+				enemyDamage = 2;
+				snowBallSize = 25.f;
+			
 			}
 		}
-
 	
- 
-		
-		enemyMaxHp = enemyCurrentHp = 3;
-		enemyDamage = 1;
-		enemySpeed = 550  ;
-		//	bully running 1 - 22, throwing 24 - 109, death 111 - 220 boss
-		if (localEnemyType == 2)
-		{
-		
-		}
-		else 
-		{
-		
-			
-		}
-
-		//enemyModel->AddAnimation("run", 1, 36);
-		//enemyModel->AddAnimation("attack", 36, 142);
-		//enemyModel->AddAnimation("dead", 144, 211);
-		
-		enemyModel->AddAnimation("run", 1, 22);
-		enemyModel->AddAnimation("attack", 24, 109);
-		enemyModel->AddAnimation("dead", 111, 220);
-
-
 		isFriend = false;
 		enemyModel->SetPositionV(entityAllPos[0]);
 	}
@@ -139,6 +119,7 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 		{
 			if (localEnemyIndex == 0) // friend  
 			{
+				enemyMaxHp = enemyCurrentHp = 6;
 				entityAllPos.push_back(CVector(2090, 100, 540));
 				entityAllPos.push_back(CVector(2234, 100, 1017));
 				entityAllPos.push_back(CVector(1194, 100, 1037));
@@ -153,18 +134,10 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 			entityAllPos.push_back(CVector(1731, 100, 224));
 		}
 
-		enemyDamage = 1;
-		enemyMaxHp = enemyCurrentHp = 3;
-		enemySpeed = 550;
-		enemyModel->AddAnimation("run", 1, 20);
-		enemyModel->AddAnimation("attack", 36, 142);
-		enemyModel->AddAnimation("dead", 144, 211);
 		enemyModel->SetPositionV(entityAllPos[0]);
 		isFriend = true;
 	}
-	
 
-	enemyModel->PlayAnimation("attack",10, true);
 	enemyModel->SetDirectionAndRotationToPoint(0, 0);
 	isDead = preDeahAnimation = false;
 	
@@ -176,34 +149,71 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 
 	//wait at spawn point
 	OnSpawnHold = true;
-
 	enemyModel->SetToFloor(0);
-
 	onHitEffect.delete_all();
 
 	//yes this will eat memory
 	onHitEffectModel.LoadModel("snowFlake/snowFlake.obj");
 	onHitEffectModel.SetScale(0.6f);
 
+	// ** Animation
+	if (localEnemyType == 0)
+	{
+		enemyModel->AddAnimation("run", 1, 36);
+		enemyModel->AddAnimation("attack", 36, 142);
+		enemyModel->AddAnimation("dead", 144, 211);
+		enemyModel->AddAnimation("idle", 125, 138);
+	}
+	//friend
+	if (localEnemyType == 1)
+	{
+		enemyMaxHp = enemyCurrentHp = 6;
+		enemyModel->AddAnimation("run", 1, 36);
+		enemyModel->AddAnimation("attack", 36, 142);
+		enemyModel->AddAnimation("dead", 144, 211);
+		enemyModel->AddAnimation("idle", 125, 138);
+	}
+	//boss
+	else if (localEnemyType == 2)
+	{
+		enemyMaxHp = enemyCurrentHp = 8;
+		enemyModel->AddAnimation("run", 1, 22);
+		enemyModel->AddAnimation("attack", 138, 240);
+		enemyModel->AddAnimation("dead", 24, 124);
+		enemyModel->AddAnimation("idle", 138, 155);
+	}
+
+	enemyModel->PlayAnimation("idle", 3, true);
+	//Shooting  
+	bullet.LoadModel("bullet/Bullet2.obj");
+	bullet.SetScale(snowBallSize);
+
+	oldTime = deltaTime = 0;
+	
+
+	//hp
+	if (isFriend) hearthHP.LoadImage("lifeHeartFriend.png");
+	else hearthHP.LoadImage("lifeHeart.png");
+	hearthHP.SetSize(15, 15);
+
 }
 
 //*************** UPDATE ***************
 void Enemy::OnUpdate(Uint32 t, Player &player, Map& map, std::vector<Enemy*>& AllEnemies, CVector enemypos)
 {
-
+	if(oldTime != 0) deltaTime = oldTime - t;
 	if (isDead) return;
 
 	if (preDeahAnimation)
 	{
-		
 		if (deathAnimationTimer == 0)
 		{
-			enemyModel->PlayAnimation("dead", 16, false);
+			if(localEnemyType == 2) enemyModel->PlayAnimation("dead", 50, false);
+			else enemyModel->PlayAnimation("dead", 33, false);
 			enemyModel->SetSpeed(0);
 			
-			deathAnimationTimer = 1000 + t;
+			deathAnimationTimer = 2000 + t;
 
-			if (localEnemyType == 2) deathAnimationTimer = t; // no death animation
 		}
 		else if(deathAnimationTimer < t) isDead = true;
 		
@@ -219,8 +229,10 @@ void Enemy::OnUpdate(Uint32 t, Player &player, Map& map, std::vector<Enemy*>& Al
 	localTime = t;
 	AllAIPlayerList = AllEnemies;
 
-	//for cutscenes
-	if (isBoxShowen) UIDialogBox::OnUpdate(localTime, enemypos);
+	//set world pos for dialog and hp
+	UIDialogBox::OnUpdate(localTime, enemypos);
+	hearthHP.SetPosition(enemypos.GetX() - 30, enemypos.GetY() + 30);
+
 	enemyModel->Update(t);
 
 	if (!OnSpawnHold)
@@ -240,12 +252,14 @@ void Enemy::OnUpdate(Uint32 t, Player &player, Map& map, std::vector<Enemy*>& Al
 		ShotsHandler();
 		//if dead -> return (do nothing)
 	}
+
+	oldTime = t;
 }
 
 //*************** 2D RENDER ***************
-void Enemy::OnDraw(CGraphics* g, CVector enemyPos)
+void Enemy::OnDraw(CGraphics* g)
 {
-	if (isBoxShowen) UIDialogBox::OnDraw(g);
+	UIDialogBox::OnDraw(g);
 	if (isDead|| OnSpawnHold) return;
 
 	CVector displ = localPlayer->playerModel.GetPositionV() - enemyModel->GetPositionV();
@@ -255,10 +269,9 @@ void Enemy::OnDraw(CGraphics* g, CVector enemyPos)
 	{
 		for (int i = 0; i < enemyCurrentHp; i++)
 		{
-			hearthHP.SetPosition(enemyPos.GetX() + i * 30, enemyPos.GetY() + enemyModel->GetTop());
+			hearthHP.SetX(hearthHP.GetX() + 20);
 			hearthHP.Draw(g);
 		}
-		
 	}
 }
 
@@ -289,7 +302,9 @@ void Enemy::EnemyGetDamage(float damage)
 
 	if (enemyCurrentHp <= 0)
 	{
-		deathSound.Play("monsterDeath.wav");
+		snowBallList.clear();
+		deathSound.Play("Death.wav");
+		deathSound.SetVolume(50);
 		preDeahAnimation = true;
  
 	}
@@ -310,10 +325,10 @@ void Enemy::EnemyControl()
 
 		currentDestinationPoint = entityAllPos[curentPosNum];
  
-		enemyModel->PlayAnimation("run", 22, true);
+		enemyModel->PlayAnimation("run", 35, true);
 		enemyModel->SetDirectionAndRotationToPoint(currentDestinationPoint.GetX(), currentDestinationPoint.GetZ());
-	 	enemyModel->MoveTo(currentDestinationPoint.GetX(), currentDestinationPoint.GetZ(), 200);
-		if ((curentPosNum != 1 && curentPosNum != 3) || localGameLvl == 3) changePosTimer = localTime + 12000; //skipps middle pos in level 1 and 2, but not 3
+	 	enemyModel->MoveTo(currentDestinationPoint.GetX(), currentDestinationPoint.GetZ(), enemySpeed);
+		if ((curentPosNum != 1 && curentPosNum != 3) || localGameLvl == 3) changePosTimer = localTime + 20000; //skipps middle pos in level 1 and 2, but not 3
 
 	}
 	else if (!enemyModel->IsAutoMoving())
@@ -327,12 +342,14 @@ void Enemy::Attack()
 	if (attackDelay < localTime)
 	{
 		enemyModel->PlayAnimation("attack", 22, true);
-		attackDelay = localTime + 3000;
 
+
+		//!!!!! NOT EFFECTIVE AS IT CHECK POSSITION ALL THE TIME INSTEAD OF DOING IT ONCE (when actual attack happens), BUT IT ROTATES ATTACK ANIMATION TOWARDS TARGET EVERY FRAME WHICH LOOK NICE!!!! 
+		
 		//finding Closest Distance
 		float closestDistance = 0;
 		float currentDist = 0;
-		CVector targetPos = {0,0,0};
+		CVector targetPos = { 0,0,0 };
 
 		//compare With All AI players
 		for (auto AIPlayer : AllAIPlayerList)
@@ -352,30 +369,42 @@ void Enemy::Attack()
 		//Compare Distance to the Player If target is not friend 
 		if (isFriend != localPlayer->isFriend)
 		{
-			currentDist = enemyModel->GetPositionV().Distance(localPlayer->playerModel.GetPositionV());
-			if (currentDist < closestDistance || closestDistance == 0)
+			float distanceToPlayer = 0;
+			distanceToPlayer = localPlayer->playerModel.GetPositionV().Distance(enemyModel->GetPositionV());
+			if (distanceToPlayer < closestDistance || closestDistance == 0)
 			{
-				closestDistance = currentDist;
+				closestDistance = distanceToPlayer;
 				targetPos = localPlayer->playerModel.GetPositionV();
 
-				if (localPlayer->playerModel.GetSpeed() > 0)
+
+				if (localPlayer->playerModel.GetSpeed() != 0)
 				{
+					flyTime = closestDistance / 1000.f;
 					// player Movement Prediction  
 					CVector playerMovemntNormal = CVector(localPlayer->playerModel.GetXVelocity(), localPlayer->playerModel.GetYVelocity(), localPlayer->playerModel.GetZVelocity()).Normalized();
-					CVector playerMovementPrediction = playerMovemntNormal  * localPlayer->playerModel.GetSpeed(); // need delta time.............
+					CVector playerMovementPrediction = playerMovemntNormal * flyTime; // need delta time.............
 					targetPos += playerMovementPrediction;
 				}
-			
 			}
 		}
+		enemyModel->SetDirectionAndRotationToPoint(targetPos.GetX(), targetPos.GetZ());
 
 
+
+		if (enemyModel->GetFrame() < 90) return; // attack by the end of the attack animations
+		attackDelay = localTime + 3000;
+
+
+		flyTime = closestDistance / 1000.f;
+	
 		CModel* pShot = bullet.Clone();
 		pShot->SetPositionV(enemyModel->GetPositionV() + CVector(0, 150, 0));
 		pShot->SetDirectionAndRotationToPoint(targetPos.GetX(), targetPos.GetZ());
 		pShot->SetSpeed(1000);
-		pShot->SetYVelocity(pShot->GetYVelocity() + closestDistance * 0.36);
-		pShot->Die(3500);
+		cout << flyTime << endl;
+		pShot->SetYVelocity(closestDistance * 0.36);
+		
+		pShot->Die(5500);
 		pShot->SetStatus(0);
 		snowBallList.push_back(pShot);
 	}
@@ -385,6 +414,7 @@ void Enemy::ShotsHandler()
 {
 	for (CModel* pShot : snowBallList)
 	{
+	 
 		for (auto mapObj : localMap->collidingObjects)
 		{
 			if (pShot->HitTest(mapObj))
@@ -394,8 +424,10 @@ void Enemy::ShotsHandler()
 			}
 		}
 		float gravity = 23;
-		pShot->SetYVelocity(pShot->GetYVelocity() - gravity);
+		
+		pShot->SetYVelocity(pShot->GetYVelocity() - (float)gravity);
 
+		 
 		if (pShot->HitTest(&localPlayer->playerModel) && !isFriend) //add distance
 		{	
 			localPlayer->playerGettingDamage(enemyDamage);
@@ -404,7 +436,7 @@ void Enemy::ShotsHandler()
 
 		for (auto AIPlayer : AllAIPlayerList)
 		{
-			if (pShot->HitTest(AIPlayer->enemyModel) && isFriend != AIPlayer->isFriend)//add distance
+			if (pShot->HitTest(AIPlayer->enemyModel) && isFriend != AIPlayer->isFriend)
 			{
 				AIPlayer->EnemyGetDamage(enemyDamage);
 				pShot->Delete();
@@ -422,22 +454,26 @@ void Enemy::initDialogues()
 	if (onStartOfTheLevel && localGameLvl == 1)
 	{
 		onStartOfTheLevel = false;
-		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, 0, 0, 9000);
-		else UIDialogBox::showBox(5, 1, 1, 9000); // friend id 5
+		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, localEnemyIndex, localEnemyIndex, 10000);
+		else UIDialogBox::showBox(5, 3, 3, 10000); // friend id 5
 	}
 
-	//level 1 entry Dialog Box
+	//level 2 entry Dialog Box
 	if (onStartOfTheLevel && localGameLvl == 2)
 	{
+		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, 7+ localEnemyIndex, 7+ localEnemyIndex, 10000);
+		else UIDialogBox::showBox(5, 10, 10, 10000); // friend id 5
 		onStartOfTheLevel = false;
-		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, 0, 0, 9000);
-		else UIDialogBox::showBox(5, 1, 1, 9000); // friend id 5
 	}
 
-	//level 1 entry Dialog Box
+	//level 3 entry Dialog Box
 	if (onStartOfTheLevel && localGameLvl == 3)
 	{
+		//the best code ever!!!!
+		int speakerId = 5;
+		if (localEnemyIndex == 1) speakerId = 3;
+	    UIDialogBox::showBox(speakerId, 14 + localEnemyIndex, 14 + localEnemyIndex, 10000);
 		onStartOfTheLevel = false;
-		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, 0, 0, 9000);
+
 	}
 }

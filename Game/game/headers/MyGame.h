@@ -59,7 +59,6 @@ private:
 
 	// Keyboard Event Handlers
 	virtual void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
-	virtual void OnLButtonDown(Uint16 x, Uint16 y);
 	virtual void OnRButtonDown(Uint16 x, Uint16 y);
 	virtual void OnRButtonUp(Uint16 x, Uint16 y);
 
@@ -100,8 +99,8 @@ private:
 
 	int curentGameLevel;
 	//Static
-	CModelMd3* enemyModelOne;
-	CModelMd3* enemyModelTwo;
+	CModelMd3* AIPlayerModelOne;
+	CModelMd3* AIPlayerModelTwo;
 	CModelMd3* boss;
 	bool isBossSpawn = false;
 

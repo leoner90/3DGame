@@ -17,7 +17,7 @@ PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)
 
 	hearthBg.LoadImage("hearthBg.png");
 	hearthBg.SetSize(230, 90);
-	hearthBg.SetPosition(120, localH - 60);
+	hearthBg.SetPosition(140, localH - 70);
 
 	//Buffs Icons
 	InvulnerableBuffLogo.LoadImage("imortalityLogo.png");
@@ -79,7 +79,7 @@ void PlayerInterface::OnDraw(CGraphics* g)
 	hearthBg.Draw(g);
 	for (int i = 0; i < localPlayer->playerCurrentHp; i++)
 	{
-		hpHeart.SetPosition(65 + i * 57, localH - 60);
+		hpHeart.SetPosition(85 + i * 57, localH - 70);
 		hpHeart.Draw(g);
 	}
 	

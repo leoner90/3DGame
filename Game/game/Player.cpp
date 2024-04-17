@@ -2,7 +2,7 @@
 #include "headers/Player/Player.h"
 #include "headers/map.h"
 #include "headers/Enemy.h"
-#include "headers/UIDialogBox.h"
+
 
 
 //*************** CONSTRUCTOR ***************
@@ -20,21 +20,21 @@ Player::Player()
 
 	//model
 	playerModel.LoadModel("Player/main.md3");
-	//playerModel.LoadTexture("Player/skin1.png");
+	playerModel.LoadTexture("Player/main.png");
 
 	playerModel.SetScale(2.f);
 
 	//main running 1 - 20, throwing 22 - 137 (frame 62 is a good pose to hold for charge), death 139 - 216  .
 	//animation
-	playerModel.AddAnimation("runF", 1, 20);
-	//playerModel.AddAnimation("runB", 64, 80);
-	//playerModel.AddAnimation("runR", 82, 99);
-	//playerModel.AddAnimation("runL", 101, 117);
-	playerModel.AddAnimation("attack", 22, 137);
-	playerModel.AddAnimation("hit", 119, 200);
-	playerModel.AddAnimation("idle", 1, 40);
+	playerModel.AddAnimation("run", 1, 20);
+	playerModel.AddAnimation("precharge", 22, 62); //62 chargingFrame
+	playerModel.AddAnimation("postcharge", 63, 137); //62 chargingFrame
+	playerModel.AddAnimation("chargehold", 62, 62);
 	playerModel.AddAnimation("death", 139, 216);
-	playerModel.AddAnimation("dash", 314, 330);
+	playerModel.AddAnimation("idle", 218, 302);
+	playerModel.AddAnimation("dash", 304, 339);
+	playerModel.AddAnimation("hit", 341, 378);
+	playerModel.AddAnimation("victory", 380, 417);
 
 	//Shooting
 	bullet.LoadModel("bullet/Bullet2.obj");
@@ -42,7 +42,7 @@ Player::Player()
 
 	//sounds
 	footsteps.Play("footsteps.wav", -1);
-	footsteps.SetVolume(20);
+	footsteps.SetVolume(55);
 	footsteps.Pause();
 
 	//Loot
@@ -52,14 +52,14 @@ Player::Player()
 	lootItemTwo.SetScale(1.f);
 	lootItemThree.LoadModel("buffs/muffin.obj");
 	lootItemThree.SetScale(52);
-}
 
+	//stats
+	playerMaxHp = playerCurrentHp = 3;
+}
 
 //*************** INIT ***************
 void Player::init(int curentGameLevel)
 {
-	 
-	//reset
 	if (curentGameLevel == 1)
 	{
 		playerModel.SetPosition(2063, 0, -1074);
@@ -80,9 +80,6 @@ void Player::init(int curentGameLevel)
 	isPlayerMoving = false;
 	playerShots.delete_all();
 	playerCurrentState = UNOCCUPIED;
-
-	//stats
-	playerMaxHp = playerCurrentHp = 3;
  
 	//buffs
 	isPlayerInvulnerable = isPlayerUnderDistanceBuff = false;
@@ -101,13 +98,13 @@ void Player::init(int curentGameLevel)
 	shootingDelay = 900;
 	playerDamage = 1; // -1 live
 	chargedDamage = 7; // x
- 
 
 	//Reset
 	isPlayerInDamage = false;
 	chargedShot = false;
 	isShotCharged = false;
 	isPlayerInDash = false;
+	chargingAnimation = false;
 	InDamageStunDelayTimer = 0;
 	startChargedShotTimer = 0;
 	repeatStunDelayTimer = 0;
@@ -116,7 +113,6 @@ void Player::init(int curentGameLevel)
 
 	//shooting reset
 	totalTimeToCharge = 1500;
- 
 
 	//loot
 	randomLootTimer = 0;
@@ -128,8 +124,11 @@ void Player::init(int curentGameLevel)
 }
 
 //*************** UPDATE ***************
-void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos)
+void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos,float cameraYrot)
 {
+	UIDialogBox::OnUpdate(t, playerWorldPos);
+	playerModel.Update(t);
+	if(playerCurrentState == CUTSCENE) return;
 	//shots
 	playerShotsHandler();
 
@@ -141,6 +140,7 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	localEnemies = AllEnemies;
 	localMap = &map;
 	localTime = t;
+	localcameraYrot = cameraYrot;
 
 	//delta time
 	deltatime = (t - prevFrameTime) / 1000  ; //in sec
@@ -185,29 +185,34 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	onHitEffect.Update(t);
 	onHitEffect.delete_if(true);
 
+	if (playerCurrentState == INATTACK && playerModel.AnimationFinished() && !chargingAnimation)
+	{
+		playerModel.PlayAnimation("chargehold", 1, true); // attackChargingHold name dosen't work
+		chargingAnimation == false;
+	}
+	
+	//Attack Delay 
+	if (playerCurrentState == INATTACK && startChargedShotTimer == 0 && playerModel.AnimationFinished())   // startChargedShotTimer != 0  indicates that right button relised
+	{
+		chargingAnimation = false;
+		playerCurrentState = UNOCCUPIED;
+	}
 
-	if (isPlayerInDamage) 
+	//charged Shot
+	chargedShotHandler();
+
+	if (isPlayerInDamage || playerCurrentState == INATTACK)
 	{
 		playerModel.Update(t);
 		return;
 	}
- 
-	//Attack Delay 
-	if (attackDelay - t <= 0 && playerCurrentState == INATTACK) playerCurrentState = UNOCCUPIED;
 	
 	//control & collisions
 	playerCollision(AllEnemies);
 	PlayerControl(Dkey, Akey, Wkey, Skey);
 
-
-
 	//loot
 	lootHandler();
-
-	//charged Shot
-	chargedShotHandler();
-
- 
 
 	lootList.delete_if(true);
 	lootList.Update(t);
@@ -220,14 +225,12 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 
 	dashEffect.Update(t);
 	dashEffect.delete_if(true);
-
-
 }
 
 //*************** 2D RENDER ***************
 void Player::OnDraw(CGraphics* g, UIDialogBox& dialogBox)
 {
- 
+	UIDialogBox::OnDraw(g);
 }
 
 //*************** 3D RENDER ***************
@@ -245,27 +248,60 @@ void Player::OnRender3D(CGraphics* g)
 //*************** PLAYER CONTROLER ***************
 void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 {
+	if (playerCurrentState == INDASH )
+	{
+		playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 30);
+	}
+
 	if (playerModel.AnimationFinished() && playerCurrentState == INDASH)
 	{
 		isPlayerInDash = false;
 		playerCurrentState = UNOCCUPIED;
 	}
 	if (playerCurrentState == INDASH) return;
+	
 
 	//moving direction
+
+	/*
 	if (Wkey)
 	{
 		playerModel.SetSpeed(650);
-		playerModel.PlayAnimation("runF", 22, true);
+		playerModel.PlayAnimation("run", 22, true);
 		isPlayerMoving = true;
-
+		//playerModel.SetDirection(0, -1);
+		playerModel.SetDirection(0,-1);
+		
+		if(Akey) playerModel.SetDirection(-1, -1);
+		else if(Dkey) playerModel.SetDirection(1, -1);
 	}
 	else if (Skey)
 	{
 		isPlayerMoving = true;
-		playerModel.SetSpeed(-450);
-		playerModel.PlayAnimation("runF", 22, true);
+		playerModel.SetSpeed(450);
+		playerModel.PlayAnimation("run", 22, true);
+		playerModel.SetDirection(0, 1);
+
+		if (Akey) playerModel.SetDirection(-1, 1);
+		else if (Dkey) playerModel.SetDirection(1, 1);
 	}
+
+	 
+	else if (Akey)
+	{
+		playerModel.SetSpeed(650);
+		playerModel.PlayAnimation("run", 22, true);
+		playerModel.SetDirection(-1,0);
+		//	playerModel.SetRotation(abs(localcameraYrot) - 90);
+	}
+	else if (Dkey)
+	{
+		playerModel.SetSpeed(650);
+		playerModel.PlayAnimation("run", 22, true);
+		playerModel.SetDirection(1, 0);
+ 
+	}
+
 	else
 	{
 		footsteps.Pause();
@@ -273,10 +309,33 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 		isPlayerMoving = false;
 		playerModel.PlayAnimation("idle", 20, true);
 	}
+	playerModel.SetRotation(playerModel.GetDirection());
+	*/
+	
+	if (Wkey)
+	{
+		playerModel.SetSpeed(650);
+		playerModel.PlayAnimation("run", 22, true);
+		isPlayerMoving = true;
+
+
+	}
+	else if (Skey)
+	{
+		isPlayerMoving = true;
+		playerModel.SetSpeed(-450);
+		playerModel.PlayAnimation("run", 22, true);
+	}
+	else {
+		isPlayerMoving = false;
+		playerModel.SetSpeed(0);
+		playerModel.PlayAnimation("idle", 22, true);
+	}
 
 	if (Akey ) { playerModel.Rotate(6); playerModel.SetDirection(playerModel.GetRotation()); }
 	if (Dkey ) { playerModel.Rotate(-6); playerModel.SetDirection(playerModel.GetRotation()); }
 	
+ 	
 	playerModel.SetDirectionV(playerModel.GetRotationV());
 }
 
@@ -292,9 +351,9 @@ void Player::OnKeyDown(SDLKey sym, CVector currentMousePos)
 			playerCurrentState = INDASH;
 			dashSound.Play("dash.wav", 1);
 			dashSound.SetVolume(75);
-			playerModel.PlayAnimation("dash", 85, false);			
-			playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 1000);
+			playerModel.PlayAnimation("dash", 60, false);			
 			playerModel.SetSpeed(0);
+
 		}
 	}
 }
@@ -335,9 +394,10 @@ void Player::playerGettingDamage(float damage)
 
 	if (playerCurrentHp <= 0)
 	{
+		playerShots.clear();
 		playerCurrentHp = 0;
 		playerPreDeahAnimation = true;
-		deathSound.Play("PlayerDeath3.wav", 1);
+		deathSound.Play("Death.wav", 1);
 	}
 	else
 	{
@@ -346,7 +406,7 @@ void Player::playerGettingDamage(float damage)
 			hitSound.Play("PlayerHurt.wav", 1);
 			hitSound.SetVolume(75);
 			repeatStunDelayTimer = 1500 + localTime;
-			playerModel.PlayAnimation("hit", 162, false);
+			playerModel.PlayAnimation("hit", 20, false);
 			InDamageStunDelayTimer = 500 + localTime;
 			savedPrevPlayerState = playerCurrentState;
 			playerCurrentState = INDAMAGE;
@@ -381,13 +441,13 @@ void Player::playerCollision(std::vector<Enemy*> AllEnemies)
 	}
 	 
 	//enemies
-	/*for (auto enemy : AllEnemies) {
-		if (enemy->deathAnimationTimer) continue;
+	for (auto enemy : AllEnemies) {
+		if (enemy->preDeahAnimation) continue;
 		if (playerModel.HitTest(enemy->enemyModel)) 
 		{
 			playerModel.SetPositionV(lastFramePos);
 		}
-	}*/
+	}
 }
 
 void Player::addLoot()
@@ -418,7 +478,7 @@ void Player::addLoot()
 
 void Player::performShot()
 {
-	playerCurrentState = INATTACK;
+	//playerCurrentState = INATTACK;
 	attackDelay = localTime + shootingDelay;
 	//chargedShot
 	playerModel.PlayAnimation("attack", 20, true);
@@ -523,11 +583,16 @@ void Player::buffHandler()
 
 void Player::OnRButtonDown(long t)
 {
-	if (playerCurrentState == UNOCCUPIED)
+	if (playerCurrentState == UNOCCUPIED && !playerPreDeahAnimation)
 	{
 		//chargedShot
+		playerCurrentState = INATTACK;
+		playerModel.SetSpeed(0);
+		playerModel.PlayAnimation("precharge", 40,false);
 		if (startChargedShotTimer == 0) startChargedShotTimer = localTime + totalTimeToCharge;
-		charginShotSound.Play("chargedshot.wav");
+		charginShotSound.Play("chargeAttack.wav");
+
+		//playerModel.SetDirectionAndRotationToPoint(localMouse->GetX(), localMouse->GetZ());
 	}
 }
 
@@ -535,35 +600,12 @@ void Player::OnRButtonDown(long t)
 void Player::OnRButtonUp()
 {
 	if (startChargedShotTimer != 0) // attack delay (if (playerCurrentState == INATTACK) - less relayeble
-	{
+	{	
+		playerModel.PlayAnimation("postcharge", 80, false); // just throwing animation
+		isShotCharged = false;
 		charginShotSound.Clear();
 		startChargedShotTimer = 0;
 		performShot();
-		isShotCharged = false;
 		chargePercent = 0;
 	}
 }
-
-
-void Player::OnMouseMove(CVector currentMousePos)
-{
-	//playerModel.SetRotationToPoint(currentMousePos.x, currentMousePos.z);
-}
-
-void Player::OnLButtonDown(CVector pos, CVector currentMousePos, long t)
-{
-
-}
-
-/*
-if (isPlayerMoving)
-{
-	CVector charDirectionV = playerModel.GetDirectionV();
-	CVector mousePos = CVector(localMouse->GetX(), 0, localMouse->GetZ());
-	CVector displ = mousePos - playerModel.GetPositionV();
-	CVector normDisp = displ.Normalized();
-
-	float dotProduct = charDirectionV.Dot(normDisp);
-	float angle = acos(dotProduct) * 180.0 / M_PI;
-}
-*/

@@ -6,7 +6,6 @@
 
 Cutscene::Cutscene(float w, float h)
 {
- 
 	//Cutscene Edges
 	screenEdges.LoadImage("screenEdges.png");
 	screenEdges.SetSize(w, h);
@@ -17,13 +16,16 @@ Cutscene::Cutscene(float w, float h)
 	darkTransition.SetSize(w, h);
 	darkTransition.SetPosition(w / 2, h / 2);
 
- 
+
+	victoryOverlay.LoadImage("victoryOverlay.png");
+	victoryOverlay.SetSize(w, h - 150);
+	victoryOverlay.SetPosition(w / 2, h / 2);
 }
 
 void Cutscene::init(float w, float h, Player& player)
 {
- 
-
+	cameraOffset = 0;
+	cutsceneTimer = 0;
 	//resets
 	dialogSwitcherTimer = 0;
 	dialogNumber = 0;
@@ -32,78 +34,52 @@ void Cutscene::init(float w, float h, Player& player)
 	curentCutSceneNum = -1;
 	cutSceneEndDimOn = false;
 	delay = 0;
-
-	//cutscene2
+	onCutsceneStart = true;
 	localPlayer = &player;
  
-	localPlayer->playerModel.SetSpeed(0);
-	cutsceneTwoStarted = false;
-	CutSceneTwoReachedPortal = false;
-	particleList.delete_all();
 
 	//camera
 	cutcceneCameraPosition = CVector(0, 0, 0);
+
+
 }
 
 void Cutscene::Update(Uint32 t, std::vector<Enemy*>& AIPlayers)
 {
- 
 	localAllAIPlayers = AIPlayers;
-
 	localTime = t;
-	if (curentCutSceneNum == 1)
-	{
-		cutSceneOne();
-	}
-	
-	else if (curentCutSceneNum == 2)
-	{
-		localPlayer->playerModel.Update(localTime);
-		particleList.Update(localTime);
-		particleList.delete_if(true);
-		cutSceneTwo();	
-	}
 
-	else if (curentCutSceneNum == 3)
-	{
-		cutSceneThree();
-	}
-
-	else if (curentCutSceneNum == 4)
-	{
-		cutSceneFour();
-	}
-
+	if (curentCutSceneNum == 1) cutSceneOne();
+	else if (curentCutSceneNum == 2) cutSceneTwo();
+	else if (curentCutSceneNum == 3) cutSceneThree();
+	else if (curentCutSceneNum == 4) cutSceneFour();
 }
 
 void Cutscene::Draw2d(CGraphics* g)
 {
+	if (curentCutSceneNum == 4) victoryOverlay.Draw(g);
 	screenEdges.Draw(g);
 
-	if (cutSceneEndDimOn)
-	{
-		darkTransition.Draw(g);
-	}
+	if (cutSceneEndDimOn) darkTransition.Draw(g);
 }
 
 void Cutscene::Draw3d(CGraphics* g)
 {
- 
 	if (curentCutSceneNum == 1)
 	{
- 
 		if(blackScreenTimer < 40 )localPlayer->playerModel.Draw(g);
 		particleList.Draw(g);
 	}
-
 }
 
 
 
 void Cutscene::cutSceneOne()
 {
-	cutcceneCameraPosition = CVector(800, 1740, 500);
+	cutcceneCameraPosition = CVector(400, 1340, 1300);
 	camerRotationAngle = 0.25;
+	xWorldRotation = 40;
+ 
 
 	if (dialogSwitcherTimer == 0 )
 	{
@@ -127,43 +103,34 @@ void Cutscene::cutSceneOne()
 		isCutscenePlaying = false;
 	}
 
- 
+	localPlayer->playerModel.Update(localTime);
 }
-
 
 void Cutscene::cutSceneTwo()
 {
-	//cutSceneOne();
-	camerRotationAngle = 0.15;
-
-	for (auto AIPlayer : localAllAIPlayers)
+	if (onCutsceneStart)
 	{
-		if (AIPlayer->isFriend)
+		if (cutsceneTimer == 0) cutsceneTimer = localTime + 15000;
+		camerRotationAngle = -50;
+		xWorldRotation = 20;
+		cameraOffset = 2580;
+		for (auto AIPlayer : localAllAIPlayers)
 		{
-			//AIPlayer->enemyModel->SetPositionV(CVector(300, 0, 500));
-			cutcceneCameraPosition = AIPlayer->enemyModel->GetPositionV();
-	
-			AIPlayer->showBox(1, 1, 1, 20000);
+			if (AIPlayer->localEnemyType == 2) // BOSS
+			{
+				cutcceneCameraPosition = AIPlayer->enemyModel->GetPositionV();
+				AIPlayer->showBox(3, 4, 6, 7500);
+			}
 		}
-	
+		onCutsceneStart = false;
 	}
 
-
-
-
-	if (dialogNumber == 10)
-	{
-		dialogNumber++;
-	}
-
-
-	if (dialogNumber == 11 && isCutscenePlaying)
+	if (dialogNumber == 11)  	cutsceneTimer = -1; // skip
+ 
+	if (cutsceneTimer < localTime)
 	{
 
-		for (auto AIPlayer : localAllAIPlayers) if (AIPlayer->isFriend) 	AIPlayer->hideBox();
-	 
-
-		
+		for (auto AIPlayer : localAllAIPlayers)  AIPlayer->hideBox();
 		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
 		blackScreenTimer += 2;
 		darkTransition.SetAlpha(blackScreenTimer);
@@ -174,56 +141,77 @@ void Cutscene::cutSceneTwo()
 	{
 		isCutscenePlaying = false;
 	}
-
-
-	/*
-	if (!cutsceneTwoStarted)
-	{
-		localPlayer->playerModel.SetPosition(1500, 0, 1500);
-	 
-		cutsceneTwoStarted = true;
-		//localDialogBox->showBox(1, 22, 22, 3, 3800);
-		
-		localPlayer->playerModel.SetSpeed(300);
-		localPlayer->playerModel.PlayAnimation("runF", 22, true);
-		localPlayer->playerModel.SetDirectionAndRotationToPoint(400, 300);
-	}
-
-	CVector displ =CVector(400, 0, 300) - localPlayer->playerModel.GetPositionV() ;
-	float distance = hypot(displ.GetX(), displ.GetZ());
-
- 
- 
-
-	if (CutSceneTwoReachedPortal && delay < localTime)
-	{
-		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
-		blackScreenTimer += 1;
-		darkTransition.SetAlpha(blackScreenTimer);
-	}
-
-	if (blackScreenTimer >= 100)
-	{
-		isCutscenePlaying = false;
- 
-		cutsceneTwoStarted = false;
-		CutSceneTwoReachedPortal = false;
-
-		particleList.delete_all();
-	}
-
-	cutcceneCameraPosition = CVector(localPlayer->playerModel.GetX() - 300, localPlayer->playerModel.GetY() + 600 , localPlayer->playerModel.GetZ());*/
- 
 }
 
 void Cutscene::cutSceneThree()
 {
-	cutSceneOne();
+	if (onCutsceneStart)
+	{
+		cutsceneTimer = localTime + 15000;
+		camerRotationAngle = -50;
+		xWorldRotation = 20;
+		cameraOffset = 2080;
+		
+
+		for (auto AIPlayer : localAllAIPlayers)
+		{
+		 
+			if (AIPlayer->localEnemyType == 0) // Friend traitor
+			{
+				cutcceneCameraPosition = AIPlayer->enemyModel->GetPositionV();
+				AIPlayer->showBox(5, 11, 13, 7500);
+			}
+		}
+
+		onCutsceneStart = false;
+	}
+	
+	if (dialogNumber == 11) cutsceneTimer = -1; // skip
+
+
+	if (cutsceneTimer < localTime)
+	{
+		for (auto AIPlayer : localAllAIPlayers)  AIPlayer->hideBox();
+		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
+		blackScreenTimer += 2;
+		darkTransition.SetAlpha(blackScreenTimer);
+	}
+
+	if (blackScreenTimer >= 100) isCutscenePlaying = false;
+
 }
 
 void Cutscene::cutSceneFour()
 {
-	cutSceneOne();
+	if (onCutsceneStart)
+	{
+		enum playerStates { UNOCCUPIED, INATTACK, INDASH, INDAMAGE, CUTSCENE };
+		localPlayer->playerCurrentState = localPlayer->CUTSCENE;
+		if (cutsceneTimer == 0) cutsceneTimer = localTime + 12000;
+		camerRotationAngle = -60;
+		xWorldRotation = 20;
+		cameraOffset = 3580;
+
+
+		cutcceneCameraPosition = localPlayer->playerModel.GetPositionV();
+		localPlayer->playerModel.PlayAnimation("victory", 12, true);
+		localPlayer->showBox(4, 16, 17, 7500);
+		onCutsceneStart = false;
+
+	}
+	if (dialogNumber == 11) cutsceneTimer = -1; // skip
+ 
+
+	if (cutsceneTimer < localTime)
+	{
+		for (auto AIPlayer : localAllAIPlayers)  AIPlayer->hideBox();
+		if (!cutSceneEndDimOn) cutSceneEndDimOn = true;
+		blackScreenTimer += 2;
+		darkTransition.SetAlpha(blackScreenTimer);
+	}
+
+	if (blackScreenTimer >= 100) isCutscenePlaying = false;
+ 
 }
 
 

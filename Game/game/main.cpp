@@ -17,10 +17,3 @@ int main(int argc, char* argv[])
 	app.Run(&game);
 	return(0);
 }
-
-
- 
- 
-
-
-//pass and controll walk function

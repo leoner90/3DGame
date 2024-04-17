@@ -13,7 +13,7 @@ public:
 	//main Functions
 	void init(int index, int enemyType, Map& map, CModelMd3& enemyModel, int curentGameLevel);
 	void OnUpdate(Uint32 t, Player& player, Map& map, std::vector<Enemy*>& AllEnemies, CVector enemypos);
-	void OnDraw(CGraphics* g, CVector enemyPos);
+	void OnDraw(CGraphics* g);
 
 	void Attack();
 	void OnRender3D(CGraphics* g);
@@ -30,6 +30,7 @@ public:
 	bool OnSpawnHold;
 	bool isFriend;
 	bool IsInLineOfSight;
+	int localEnemyType;
 private:
 	
 	//local
@@ -37,7 +38,7 @@ private:
 	Map* localMap;
 	vector<Enemy*> AllAIPlayerList;
 	Uint32 localTime;
-	int localEnemyType;
+	
 	int localEnemyIndex;
 	int localGameLvl;
 
@@ -55,9 +56,8 @@ private:
 	//enemy stats
 	float enemySpeed;
 	float enemyMaxHp, enemyCurrentHp;
-	bool onStartOfTheLevel;
-	
-
+	bool onStartOfTheLevel, onStartOfTheLevel2;
+ 
 	//Change Pos Timer
 	float changePosTimer;
 
@@ -76,4 +76,10 @@ private:
 	CModel bullet;
 	CSprite hearthHP;
 
+	float snowBallSize;
+
+	float flyTime;
+
+	float oldTime;
+	float deltaTime;
 };

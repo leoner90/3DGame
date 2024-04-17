@@ -13,22 +13,50 @@ UIDialogBox::UIDialogBox()
 	isBoxShowen = false;
 	hideInSec = 0;
 	//DIALOGS
-	name[0] = "Andreas";
-	name[1] = "Victor";
-	name[2] = "Jarek";
-	name[3] = "Shinma";
+	name[0] = "Petr"; // regular enemy
+	name[1] = "Victor"; // regular enemy
+	name[2] = "Bob"; // regular enemy
+	name[3] = "Shinma (Boss)";// BOSS
 	name[4] = "Leo"; // Player
-	name[5] = "Light"; // Friend
+	name[5] = "Light (Friend)"; // Friend
  
 
-	//cutscene 1
-	text[0] = "Are you ready \nto eat snow. \nDon't cry later";
-	text[1] = "We Will Win \nWe are the best! \nYes My Friend?";
-	text[2] = "What Was that?????";
-	text[3] = "Myne, somethings-\n hap- can’t- repon-\n shutting- dow-";
-	text[4] = "Blinky?\n Hey!\n Blinky!";
-	text[5] = "The ship control is \nnon-responsive, \nwhat the hell? What is going on? ";
-	text[6] = "How much longer\n, Blinky? This is\n taking forever. ";
+
+ 
+		
+
+	//levele 1 start dialogues
+	text[0] = "Are you ready \nto eat snow. \nDon't cry later.";
+	text[1] = "Let's make sure \nthey regret \nchallenging us!";
+	text[2] = "Crush them with \nour icy might! ";
+	text[3] = "We Will Win \nWe are the best! \nYes My Friend?"; //friend
+
+	//levele 2 Cutscene 2 BOSS
+	text[4] = "Enough of these \nlittle distractions.";
+	text[5] = "\nAre you the king ? ";
+	text[6] = "\nI will crush you. ";
+
+	//levele 2 start dialogues
+	text[7] = "It's time to \nturn the snow into \nour weapon ";
+	text[8] = "Let's dominate the \nsnow battlefield! ";
+	text[9] = "Listen up, team! \nNo mercy in this \nsnow showdown!"; // boss
+	text[10] = "Prepare for defeat \nonce more \nmark my words."; //friend
+
+
+	//levele 3 Cutscene 3 Friend  Betrayal
+	text[11] = "I don’t need \nyou anymore, \nyou naive fool";
+	text[12] = "Your reign as king \nhas gone for \nfar too long.";
+	text[13] = "Now, WE rule \nthis playground!!”.";
+
+ 
+	//levele 3 start dialogues
+	text[14] = "Let's chill him \nout, my new friend, \nFor the victory! ";
+	text[15] = "Prepare to witness \nas we crush you \nand secure the win!";
+
+	//Cutscene 4 VICTORY
+	text[16] = "I did it! \nVictory is mine";
+	text[17] = "Who is now tasting \nthe bitterness \nof defeat, huh?";
+
 }
 
 void UIDialogBox::OnUpdate(long t, CVector position)
@@ -45,7 +73,7 @@ void UIDialogBox::OnUpdate(long t, CVector position)
 		
 	}
 
-	dialogBoxBg.SetPosition(position.GetX() + 60, position.GetY() + 60);
+	if(isBoxShowen) dialogBoxBg.SetPosition(position.GetX() + 60, position.GetY() + 60);
 	
 }
 
@@ -55,7 +83,7 @@ void UIDialogBox::OnDraw(CGraphics* g)
 	{
 		dialogBoxBg.Draw(g);
 		//text
-		font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35 , name[speaker], CColor::DarkRed(), 18);
+		font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35 , name[speaker], speaker == 5 ? CColor::DarkGreen() :CColor::DarkRed(), 18);
 		TextConverter::splitTextToLines(text[dialogNumber], dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 15, 18);
 	}
 }

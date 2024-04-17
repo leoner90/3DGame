@@ -28,7 +28,7 @@ public:
 	int curentCutSceneNum;
 	float dialogSwitcherTimer;
 	CVector cutcceneCameraPosition;
-
+	float cameraOffset, xWorldRotation;
 private:
 	enum Cutsenes { START, END };
 	std::vector<Enemy*> localAllAIPlayers;
@@ -49,6 +49,11 @@ private:
 	float delay;
 	bool cutsceneTwoStarted, CutSceneTwoReachedPortal; // to redo
 	int blackScreenTimer;
+
+	float cutsceneTimer;
+	bool onCutsceneStart;
+	CSprite victoryOverlay;
+
 };
 
  
