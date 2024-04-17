@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "headers/Player/Player.h"
 #include "headers/Player/PlayerInterface.h"
-#include "headers/UIDialogBox.h"
 
 
 PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)
@@ -61,7 +60,7 @@ void PlayerInterface::init(int gameWidth, int gameHeigth)
 	hitEffectTimer = 0;
 }
 
-void PlayerInterface::OnUpdate(Uint32 t, Player& player, UIDialogBox& dialogBox)
+void PlayerInterface::OnUpdate(Uint32 t, Player& player)
 {
 	localPlayer = &player;
 	localTime = t;

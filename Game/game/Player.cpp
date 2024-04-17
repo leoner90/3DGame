@@ -228,7 +228,7 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 }
 
 //*************** 2D RENDER ***************
-void Player::OnDraw(CGraphics* g, UIDialogBox& dialogBox)
+void Player::OnDraw(CGraphics* g)
 {
 	UIDialogBox::OnDraw(g);
 }

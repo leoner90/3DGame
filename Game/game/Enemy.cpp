@@ -89,8 +89,9 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 
 		if (localGameLvl == 3)
 		{
-			if (localEnemyIndex == 0) // enemy 1 pos
+			if (localEnemyIndex == 0) // enemy 1 pos ( friend)
 			{
+				enemyMaxHp = enemyCurrentHp = 6;
 				entityAllPos.push_back(CVector(-1883, 100, 198));
 				entityAllPos.push_back(CVector(-654, 100, 1080));
 				entityAllPos.push_back(CVector(-177, 100, 351));
@@ -119,7 +120,6 @@ void Enemy::init(int index, int enemyType, Map& map, CModelMd3& enemyMod, int cu
 		{
 			if (localEnemyIndex == 0) // friend  
 			{
-				enemyMaxHp = enemyCurrentHp = 6;
 				entityAllPos.push_back(CVector(2090, 100, 540));
 				entityAllPos.push_back(CVector(2234, 100, 1017));
 				entityAllPos.push_back(CVector(1194, 100, 1037));

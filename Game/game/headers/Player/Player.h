@@ -15,7 +15,7 @@ public:
 	//Main Functions
 	void init(int curentGameLevel);
 	void OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos, float cameraYrot);
-	void OnDraw(CGraphics* g, UIDialogBox& dialogBox);
+	void OnDraw(CGraphics* g);
 	void OnRender3D(CGraphics* g);
 
 	//Main Controler

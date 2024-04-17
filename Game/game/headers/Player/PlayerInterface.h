@@ -1,7 +1,6 @@
 #pragma once
 
 class Player;
-class UIDialogBox;
 
 class PlayerInterface
 {
@@ -10,7 +9,7 @@ public:
 
 	//Main Functions
 	void init(int gameWidth, int gameHeigth);
-	void OnUpdate(Uint32 t, Player& player, UIDialogBox& dialogBox);
+	void OnUpdate(Uint32 t, Player& player);
 	void OnDraw(CGraphics* g);	
 private:
 	

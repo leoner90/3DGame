@@ -6,11 +6,8 @@ class Map;
 class Player;
 class PlayerInterface;
 class Enemy;
-class Shop;
-class UIDialogBox;
 class Cutscene;
 class LoadingScreen;
-class Portal;
 class Radar;
 
 class CMyGame : public CGame
@@ -26,7 +23,6 @@ private:
 	Player* player;
 	PlayerInterface* playerInterface;
 	Cutscene* cutscene;
-	UIDialogBox* dialogBox;
 	LoadingScreen* loadingScreen;
 	Radar* radar;
 	std::vector<Enemy*> AIPlayers;
@@ -38,7 +34,6 @@ private:
 	Uint32 totalEnemiesOnHold;
 	float  enemyOneSpawnDelay, enemyTwoSpawnDelay, InitSpawnDelay;
 	int totalEnemiesToSpawn;
-
 
 	// Game Funtions
 	virtual void OnInitialize();
@@ -76,16 +71,10 @@ private:
 	//pause menus
 	void MaiMenuDraw(CGraphics* g);
  
-
 	//sound
 	CSoundPlayer mainBgMusic;
-	CSoundPlayer rainBgEffect;
-	CSoundPlayer bossSpawnSound;
-
-	void OnMButtonDown(Uint16 x, Uint16 y);
-	void OnMButtonUp(Uint16 x, Uint16 y);
-
-	bool cameraMovement;
+	CSoundPlayer weatherBgEffect;
+ 
 
 	CVector currentMousePosToScreen, currentMousePos;
  
@@ -98,12 +87,9 @@ private:
 	float localH, localW;
 
 	int curentGameLevel;
-	//Static
+
 	CModelMd3* AIPlayerModelOne;
 	CModelMd3* AIPlayerModelTwo;
 	CModelMd3* boss;
 	bool isBossSpawn = false;
-
-
-
 };
