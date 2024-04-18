@@ -1,7 +1,7 @@
 #include "Sprite.h"
 
 #include "GameApp.h"
-#include "headers/MyGame.h"
+#include "../headers/MyGame.h"
 
 // export game to be accessed from other classes
 extern CMyGame game;

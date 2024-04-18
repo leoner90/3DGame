@@ -1,6 +1,6 @@
 #include "Game.h"
-#include "headers/Map.h"
-#include "headers/Player/Player.h"
+#include "../headers/Map.h"
+#include "../headers/Player/Player.h"
 
 Map::Map()
 {

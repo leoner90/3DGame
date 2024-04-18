@@ -16,10 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-    <Text Include="level1.txt" />
-    <Text Include="level2.txt" />
-    <Text Include="level3.txt" />
-    <Text Include="init.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -63,37 +59,37 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Source\AIPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyGame.cpp">
+    <ClCompile Include="Source\Cutscene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="Source\loadingScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
+    <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerInterface.cpp">
+    <ClCompile Include="Source\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AIPlayer.cpp">
+    <ClCompile Include="Source\MyGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIDialogBox.cpp">
+    <ClCompile Include="Source\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cutscene.cpp">
+    <ClCompile Include="Source\PlayerInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="loadingScreen.cpp">
+    <ClCompile Include="Source\Radar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="textConverter.cpp">
+    <ClCompile Include="Source\textConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Radar.cpp">
+    <ClCompile Include="Source\UIDialogBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

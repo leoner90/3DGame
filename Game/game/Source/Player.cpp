@@ -1,7 +1,7 @@
 #include "Game.h"
-#include "headers/Player/Player.h"
-#include "headers/map.h"
-#include "headers/AIPlayer.h"
+#include "../headers/Player/Player.h"
+#include "../headers/map.h"
+#include "../headers/AIPlayer.h"
 
 
 
@@ -50,9 +50,6 @@ Player::Player()
 	lootItemTwo.SetScale(1.f);
 	lootItemThree.LoadModel("buffs/muffin.obj");
 	lootItemThree.SetScale(52);
-
-	//stats
-	playerMaxHp = playerCurrentHp = 3;
 }
 
 //*************** INIT ***************
@@ -61,6 +58,7 @@ void Player::init(int curentGameLevel)
 	//possition
 	if (curentGameLevel == 1)
 	{
+		playerMaxHp = playerCurrentHp = 3; 	//stats 
 		playerModel.SetPosition(2063, 0, -1074);
 		playerModel.SetRotation(180);
 	}

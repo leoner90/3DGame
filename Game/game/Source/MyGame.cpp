@@ -1,11 +1,11 @@
-#include "headers/MyGame.h"
-#include "headers/Player/Player.h"
-#include "headers/Player/PlayerInterface.h"
-#include "headers/AIPlayer.h"
-#include "headers/Map.h"
-#include "headers/Cutscene.h"
-#include "headers/loadingScreen.h"
-#include "headers/Radar.h"
+#include "../headers/MyGame.h"
+#include "../headers/Player/Player.h"
+#include "../headers/Player/PlayerInterface.h"
+#include "../headers/AIPlayer.h"
+#include "../headers/Map.h"
+#include "../headers/Cutscene.h"
+#include "../headers/loadingScreen.h"
+#include "../headers/Radar.h"
 
 CMyGame::CMyGame()
 {

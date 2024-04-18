@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "headers/loadingScreen.h"
+#include "../headers/loadingScreen.h"
 
 LoadingScreen::LoadingScreen(float w, float h)
 {

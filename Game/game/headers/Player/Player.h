@@ -1,5 +1,5 @@
 #pragma once
-#include "headers/UIDialogBox.h"
+#include "../headers/UIDialogBox.h"
 
 //Forwarding Classes
 class Map;

@@ -1,6 +1,6 @@
 #include "Game.h"
-#include "headers/Player/Player.h"
-#include "headers/Player/PlayerInterface.h"
+#include "../headers/Player/Player.h"
+#include "../headers/Player/PlayerInterface.h"
 
 
 PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)

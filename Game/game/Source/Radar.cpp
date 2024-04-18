@@ -1,8 +1,8 @@
 #include "Game.h"
-#include "headers/Radar.h"
-#include "headers/AIPlayer.h"
-#include "headers/Player/Player.h"
-#include "headers/Map.h"
+#include "../headers/Radar.h"
+#include "../headers/AIPlayer.h"
+#include "../headers/Player/Player.h"
+#include "../headers/Map.h"
 
 Radar::Radar(float w, float h)
 {

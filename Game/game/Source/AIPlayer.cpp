@@ -1,7 +1,7 @@
 #include "Game.h"
-#include "headers/AIPlayer.h"
-#include "headers/Player/Player.h"
-#include "headers/Map.h"
+#include "../headers/AIPlayer.h"
+#include "../headers/Player/Player.h"
+#include "../headers/Map.h"
 #include <math.h> 
 
 

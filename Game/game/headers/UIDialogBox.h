@@ -1,5 +1,5 @@
 #pragma once
-#include "headers/textConverter.h"
+#include "../headers/textConverter.h"
 
 class UIDialogBox :public TextConverter
 {

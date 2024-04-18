@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "headers/UIDialogBox.h"
+#include "../headers/UIDialogBox.h"
  
 UIDialogBox::UIDialogBox()
 { 

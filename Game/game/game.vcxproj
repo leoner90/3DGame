@@ -93,10 +93,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="init.txt" />
-    <Text Include="level1.txt" />
-    <Text Include="level2.txt" />
-    <Text Include="level3.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -114,17 +110,17 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AIPlayer.cpp" />
-    <ClCompile Include="Cutscene.cpp" />
-    <ClCompile Include="Radar.cpp" />
-    <ClCompile Include="textConverter.cpp" />
-    <ClCompile Include="loadingScreen.cpp" />
-    <ClCompile Include="UIDialogBox.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PlayerInterface.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyGame.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Source\AIPlayer.cpp" />
+    <ClCompile Include="Source\Cutscene.cpp" />
+    <ClCompile Include="Source\loadingScreen.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Map.cpp" />
+    <ClCompile Include="Source\MyGame.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerInterface.cpp" />
+    <ClCompile Include="Source\Radar.cpp" />
+    <ClCompile Include="Source\textConverter.cpp" />
+    <ClCompile Include="Source\UIDialogBox.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "headers/textConverter.h"
+#include "../headers/textConverter.h"
 #include <sstream>
 #include <string>
 #include <vector>
