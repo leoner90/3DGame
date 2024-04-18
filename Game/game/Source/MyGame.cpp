@@ -47,7 +47,7 @@ void CMyGame::OnInitialize()
 	//Mouse Init Controll
 	mousePointer.SetPosition(localW / 2, localH / 2 + 300);
 	HideMouse();
-	//SDL_WM_GrabInput(SDL_GRAB_ON);
+	SDL_WM_GrabInput(SDL_GRAB_ON);
 }
 
 //ON NEW LEVEL START
@@ -256,8 +256,8 @@ void CMyGame::CameraControl(CGraphics* g)
 
 	if (currentMenuState == CUTSCENE && gameStarted ) glTranslatef(0, -cutscene->cutcceneCameraPosition.GetY() - 800 ,  0);
 	else  
-		//glTranslatef(0, -player->playerModel.GetY() + 0 - camera.position.y, 0);
-		glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 	
+		glTranslatef(0, -player->playerModel.GetY() + 0 - camera.position.y, 0);
+		//glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 	
 		
 	// it makes the skydome stationary / draw the skydome before game world is translated
 	skydome.Draw(g);
@@ -503,6 +503,7 @@ void CMyGame::MainMenuController(SDLKey sym)
 //MOUSE EVENTS
 void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLeft, bool bRight, bool bMiddle)
 {
+	/*
 	//Prevents player from shooting behind the model
 	 if (y < localH / 2 + 100)
 	{
@@ -519,8 +520,8 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 		mousePointer.SetPosition(x, y);
 		currentMousePos = CVector{ (float)x, 0 ,(float)y };
 	} 
-
-	/*
+	*/
+ 
 	float sensitivity = 0.07f;
 
 	static float avgrelx = 0;
@@ -533,7 +534,7 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 
  
  
-	player->playerModel.Rotate(-sensitivity * avgrelx); player->playerModel.SetDirection(player->playerModel.GetRotation());
+	//player->playerModel.Rotate(-sensitivity * avgrelx); player->playerModel.SetDirection(player->playerModel.GetRotation());
  
 	camera.rotation.y += sensitivity * avgrelx;
 
@@ -542,9 +543,9 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 	if (camera.rotation.x < 0) camera.rotation.x = 0;
 	if (camera.rotation.x > 80) camera.rotation.x = 80;
 
-	if (camera.rotation.y > 360 || camera.rotation.y < -360) camera.rotation.y = 0;
+	//if (camera.rotation.y > 360 || camera.rotation.y < -360) camera.rotation.y = 0;
 
-	*/
+ 
 }
 
 void CMyGame::OnRButtonDown(Uint16 x, Uint16 y)

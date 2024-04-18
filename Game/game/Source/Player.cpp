@@ -60,7 +60,7 @@ void Player::init(int curentGameLevel)
 	{
 		playerMaxHp = playerCurrentHp = 3; 	//stats 
 		playerModel.SetPosition(2063, 0, -1074);
-		playerModel.SetRotation(180);
+		//playerModel.SetRotation(180);
 	}
 	else if (curentGameLevel == 2)
 	{
@@ -245,6 +245,7 @@ void Player::UpdateForCutscene(UINT32 t, CVector playerWorldPos)
 //*************** PLAYER CONTROLER ***************
 void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 {
+	//cameraYrot
 	if (playerCurrentState == INDASH) //ROLL
 		playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 30);
 	
@@ -256,30 +257,35 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	}
 	if (playerCurrentState == INDASH) return;
 	
-
+	 
 	//moving direction
-
-	/*
+	//
+	//camera.rotation.y
 	if (Wkey)
 	{
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
 		isPlayerMoving = true;
-		//playerModel.SetDirection(0, -1);
 		playerModel.SetDirection(0,-1);
-		
-		if(Akey) playerModel.SetDirection(-1, -1);
-		else if(Dkey) playerModel.SetDirection(1, -1);
+		playerModel.SetRotation(90 - localcameraYrot);
+	
+
+
+		if(Akey) playerModel.SetRotation(135 - localcameraYrot);
+		else if(Dkey) playerModel.SetRotation(45 - localcameraYrot);
+		playerModel.SetDirection(playerModel.GetRotation());
 	}
 	else if (Skey)
 	{
 		isPlayerMoving = true;
 		playerModel.SetSpeed(450);
 		playerModel.PlayAnimation("run", 22, true);
-		playerModel.SetDirection(0, 1);
+		//playerModel.SetDirection(0, 1);
 
-		if (Akey) playerModel.SetDirection(-1, 1);
-		else if (Dkey) playerModel.SetDirection(1, 1);
+		playerModel.SetRotation(270 - localcameraYrot );
+		if (Akey) playerModel.SetRotation(225 - localcameraYrot);
+		else if (Dkey) playerModel.SetRotation(315 - localcameraYrot);
+		playerModel.SetDirection(playerModel.GetRotation());
 	}
 
 	 
@@ -287,15 +293,19 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	{
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
-		playerModel.SetDirection(-1,0);
+		//playerModel.SetDirection(-1,0);
+		playerModel.SetRotation(180 - localcameraYrot);
+		playerModel.SetDirection(playerModel.GetRotation());
 		//	playerModel.SetRotation(abs(localcameraYrot) - 90);
+	
 	}
 	else if (Dkey)
 	{
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
 		playerModel.SetDirection(1, 0);
- 
+		playerModel.SetRotation(0 - localcameraYrot);
+		playerModel.SetDirection(playerModel.GetRotation());
 	}
 
 	else
@@ -305,9 +315,10 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 		isPlayerMoving = false;
 		playerModel.PlayAnimation("idle", 20, true);
 	}
-	playerModel.SetRotation(playerModel.GetDirection());
-	*/
+	//playerModel.SetRotation(playerModel.GetDirection());
 	
+	
+	/*
 	if (Wkey)
 	{
 		playerModel.SetSpeed(650);
@@ -330,6 +341,7 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	if (Dkey ) { playerModel.Rotate(-6); playerModel.SetDirection(playerModel.GetRotation()); }
 	
 	playerModel.SetDirectionV(playerModel.GetRotationV());
+	*/
 }
 
 //*** KEYBOARD EVENTS
@@ -369,7 +381,7 @@ void Player::chargedShotHandler()
 //*** GETTING DAMAGE
 void Player::playerGettingDamage(float damage)
 {
-	//return;
+	return;
 	if (playerPreDeahAnimation || isPlayerInvulnerable) return;
 
 	playerCurrentHp -= damage;
@@ -597,7 +609,7 @@ void Player::OnRButtonDown(long t)
 		if (startChargedShotTimer == 0) startChargedShotTimer = localTime + totalTimeToCharge;
 		charginShotSound.Play("chargeAttack.wav");
 
-		//playerModel.SetDirectionAndRotationToPoint(localMouse->GetX(), localMouse->GetZ());
+		playerModel.SetDirectionAndRotationToPoint(localMouse->GetX(), localMouse->GetZ());
 	}
 }
 
