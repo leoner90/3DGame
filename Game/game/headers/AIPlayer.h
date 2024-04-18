@@ -5,24 +5,26 @@
 class Player;
 class Map;
 
-class Enemy : public UIDialogBox
+class AIPlayer : public UIDialogBox
 {
 public:
-	~Enemy();
+	~AIPlayer();
 	
 	//main Functions
-	void init(int index, int enemyType, Map& map, CModelMd3& enemyModel, int curentGameLevel);
-	void OnUpdate(Uint32 t, Player& player, Map& map, std::vector<Enemy*>& AllEnemies, CVector enemypos);
+	void init(int index, int enemyType, Map& map, CModelMd3& AIPlayerModel, int curentGameLevel);
+	void OnUpdate(Uint32 t, Player& player, Map& map, std::vector<AIPlayer*>& AllAIPlayers, CVector enemypos);
 	void OnDraw(CGraphics* g);
 
+	//Control Functions
 	void Attack();
 	void OnRender3D(CGraphics* g);
-	//CModel Vfx)
 	void EnemyGetDamage(float damage);
-	void EnemyControl();
+	void AIPlayerControl();
 	void ShotsHandler();
 	void initDialogues();
-	CModelMd3* enemyModel;
+	void AIPlayersInitPositions();
+	void AIPlayersInitAnimations();
+
 
 	//TO DO GETTERS
 	bool isDead;
@@ -31,23 +33,23 @@ public:
 	bool isFriend;
 	bool IsInLineOfSight;
 	int localEnemyType;
+	CModelMd3* AIPlayerModel;
 private:
 	
 	//local
 	Player* localPlayer;
 	Map* localMap;
-	vector<Enemy*> AllAIPlayerList;
+	vector<AIPlayer*> AllAIPlayerList;
 	Uint32 localTime;
-	
 	int localEnemyIndex;
 	int localGameLvl;
 
-	CModelList onHitEffect;
- 
-	CSoundPlayer deathSound;
+	//onHit
 	CModel onHitEffectModel;
+	CModelList onHitEffect;
+
+	//Death Tiemr
 	Uint32 deathAnimationTimer;
-	CHealthBar enemyHpbar;
 
 	//attack
 	float enemyDamage;
@@ -56,7 +58,7 @@ private:
 	//enemy stats
 	float enemySpeed;
 	float enemyMaxHp, enemyCurrentHp;
-	bool onStartOfTheLevel, onStartOfTheLevel2;
+	bool onStartOfTheLevel;
  
 	//Change Pos Timer
 	float changePosTimer;
@@ -64,22 +66,25 @@ private:
 	//Attack / Hide timer
 	float AttackHideTimer;
 
-
-	vector<CVector > entityAllPos;
-
+	//AIPlayer Positions
+	vector<CVector> entityAllPos;
 	CVector currentDestinationPoint;
-
-	CVector lastFramePos;
-
 	int curentPosNum;
-	CModelList snowBallList;
-	CModel bullet;
+	CVector lastFramePos;
+	
+	//HP
 	CSprite hearthHP;
 
-	float snowBallSize;
-
+	//Snoball control
 	float flyTime;
+	float snowBallSize;
+	CModel bullet;
+	CModelList snowBallList;
 
+	//sound
+	CSoundPlayer deathSound;
+
+	//delta time
 	float oldTime;
 	float deltaTime;
 };

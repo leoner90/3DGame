@@ -14,30 +14,31 @@ public:
 	void showBox(int speakerId, int textIdStart, int textIdEnd,  float autohideBoxin  );
 	void hideBox();
 
+	//TO DO GETTERS SETTERS
 	bool isBoxShowen;
 
-
 private:
+	//Allows to use new line in text \n
+	TextConverter* textConverter;
+	
+	//Texts and Speakers
+	std::string text[18], name[6];
+
+	//fonts
+	CFont font;
+
+	//local Variables
+	float localW, localH;
+	float localTime;
+
+	//Dialog box BG
+	CSprite dialogBoxBg;
+
 	//settings
 	int speaker;
 	float hideInSec;
-	CSprite dialogBoxBg;
-
-	//Set current Speacker
-	enum currentSpeaker { MYNE, BLINKY };
-
-	float localW, localH;
-
 	int dialogNumber, dialogEndNumber;
-	std::string text[27], name[7];
-	
-	CFont font;
 
-	vector2f initPosDialogBox;
-
-	float localTime;
-
-	TextConverter* textConverter;	 
-
+	//Dialog Box Position in the World
 	CVector dialogBoxPos;
 };

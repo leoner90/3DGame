@@ -1,5 +1,5 @@
 #pragma once
- 
+
 class TextConverter
 {
 public:
@@ -9,5 +9,3 @@ public:
 private:
 	CFont font;
 };
-
- 

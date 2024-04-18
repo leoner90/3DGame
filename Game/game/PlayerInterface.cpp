@@ -5,10 +5,11 @@
 
 PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)
 {
-	localH = gameHeigth;
-	localW = gameWidth;
 	font.LoadDefault();
 
+	//local Var
+	localH = gameHeigth;
+	localW = gameWidth;
 
 	//hp
 	hpHeart.LoadImage("lifeHeart.png");
@@ -32,7 +33,6 @@ PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)
 	chargedShotBarBG.SetSize(200, 100);
 	chargedShotBarBG.SetPosition(localW /2 ,  250);
 
-
 	chargedShotBar.SetSize(180, 40);
 	chargedShotBar.SetPosition(localW / 2, 260);
 	chargedShotBar.SetColors(CColor::Blue(), CColor::Red(), CColor::Blue());
@@ -47,34 +47,37 @@ PlayerInterface::PlayerInterface(float gameWidth, float gameHeigth)
 	sprintSkillLogoOff.SetSize(68, 80);
 	sprintSkillLogoOff.SetPosition(localW - 65, 235 );
 
-
 	//player In Damage Effect
 	hitEffectBg.LoadImage("hitEffect.png");
 	hitEffectBg.SetSize(localW, localH);
 	hitEffectBg.SetPosition(localW / 2, localH / 2);
-
 }
 
+//*** INIT
 void PlayerInterface::init(int gameWidth, int gameHeigth)
 {
 	hitEffectTimer = 0;
 }
 
+//*** UPDATE
 void PlayerInterface::OnUpdate(Uint32 t, Player& player)
 {
+	//local Var
 	localPlayer = &player;
 	localTime = t;
+
+	//Charged Shot Handler
 	chargedShotBar.SetHealth(localPlayer->chargePercent);
 	chargedShotBar.Update(localTime);
 
+	//Hit Effect 
 	if (localPlayer->isPlayerInDamage && hitEffectTimer == 0) hitEffectTimer = t + 1500;
-
 	if (hitEffectTimer < t) hitEffectTimer = 0;
 }
 
 void PlayerInterface::OnDraw(CGraphics* g)
 {
-
+	//Health Bar
 	hearthBg.Draw(g);
 	for (int i = 0; i < localPlayer->playerCurrentHp; i++)
 	{
@@ -82,22 +85,20 @@ void PlayerInterface::OnDraw(CGraphics* g)
 		hpHeart.Draw(g);
 	}
 	
-
- 
+	//SKILLS Logo Draw
 	if(localPlayer->dashCoolDown < localTime)
 		sprintSkillLogoOn.Draw(g);
 	else
 		sprintSkillLogoOff.Draw(g);
  
-	 
+	//Charged Shot DRAW
 	if (localPlayer->chargePercent > 0)
 	{
 		chargedShotBar.Draw(g);
 		chargedShotBarBG.Draw(g);
 	}
 
-
-	//resources
+	//Buffs
 	if (localPlayer->isPlayerInvulnerable )
 	{
 		InvulnerableBuffLogo.Draw(g);
@@ -110,6 +111,6 @@ void PlayerInterface::OnDraw(CGraphics* g)
 		font.DrawNumber(localW - 65, localH - 90, round(localPlayer->distanceBuffTimer - localTime) / 100.0  , CColor::White(), 30);
 	}
 
+	//Hit EffectS
 	if(hitEffectTimer != 0 ) hitEffectBg.Draw(g);
- 
 }

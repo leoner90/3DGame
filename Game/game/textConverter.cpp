@@ -11,7 +11,7 @@ TextConverter::TextConverter()
 
 void TextConverter::splitTextToLines(string text, float xpos, float ypos, int fonSize)
 {
-	
+	//Checks does text have \n , if so - creates new Line
 	stringstream ss(text);
 	string to;
 
@@ -24,5 +24,3 @@ void TextConverter::splitTextToLines(string text, float xpos, float ypos, int fo
 		}
 	}
 }
-
-

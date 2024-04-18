@@ -37,7 +37,7 @@
     <ClInclude Include="headers\Player\PlayerInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Enemy.h">
+    <ClInclude Include="headers\AIPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\UIDialogBox.h">
@@ -78,7 +78,7 @@
     <ClCompile Include="PlayerInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="AIPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UIDialogBox.cpp">

@@ -12,18 +12,29 @@ public:
 	void OnUpdate(Uint32 t, Player& player);
 	void OnDraw(CGraphics* g);	
 private:
-	
+	//fonts
 	CFont font;
+
+	//local Var
 	Player* localPlayer;
 	float localH, localW;
-	CSprite hpHeart, hearthBg, chargedShotBarBG;
 	float localTime;
-	float hitEffectTimer;
 
+	//Health
+	CSprite hpHeart, hearthBg;
+
+	//Charged Shot UI
+	CSprite chargedShotBarBG;
 	CHealthBar  chargedShotBar;
-	CSprite  sprintSkillLogoOn, sprintSkillLogoOff;
-	CSprite InvulnerableBuffLogo, distanceBuffLogo;
-	CSprite hitEffectBg;
-};
 
- 
+	//Hit Effect
+	float hitEffectTimer;
+	CSprite hitEffectBg;
+
+	//Roll Skill Logo
+	CSprite  sprintSkillLogoOn, sprintSkillLogoOff;
+
+	//Buffs Logo
+	CSprite InvulnerableBuffLogo, distanceBuffLogo;
+
+};

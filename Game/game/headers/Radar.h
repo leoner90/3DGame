@@ -1,5 +1,6 @@
 #pragma once
-class Enemy;
+//Forward Declaration
+class AIPlayer;
 class Player;
 class Map;
 
@@ -10,21 +11,25 @@ public:
 
 	//Main Functions
 	void init();
-	void OnUpdate(Uint32 t, std::vector<Enemy*>& AllEnemies, Player& player, Map& map);
+	void OnUpdate(Uint32 t, std::vector<AIPlayer*>& AllAIPlayerList, Player& player, Map& map);
 	void OnDraw(CGraphics* g);
 
 private:
 	void DrawDot(float posX, float posZ, CColor color, CGraphics* g);
 
+	//Radar ItSelf
 	CSprite radarBg, radarCover;
+	float radarSize;
+
+	//Player & AIPlayers Dots
 	CSprite dot;
 	CSpriteList dotList;
 
-	std::vector<Enemy*> localAllEnemies;
+	//Local Variables
+	std::vector<AIPlayer*> localAllAIPlayerList;
 	Player* localPlayer;
-	float radarSize;
+
+	//ray Casting Show enemies only in Front Of Player
 	CLine ray;
 	int cooldown;
 };
-
- 

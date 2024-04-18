@@ -106,7 +106,7 @@
     <ClInclude Include="headers\Radar.h" />
     <ClInclude Include="headers\textConverter.h" />
     <ClInclude Include="headers\UIDialogBox.h" />
-    <ClInclude Include="headers\Enemy.h" />
+    <ClInclude Include="headers\AIPlayer.h" />
     <ClInclude Include="headers\MyGame.h" />
     <ClInclude Include="headers\Player\Player.h" />
     <ClInclude Include="headers\Player\PlayerInterface.h" />
@@ -114,7 +114,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="AIPlayer.cpp" />
     <ClCompile Include="Cutscene.cpp" />
     <ClCompile Include="Radar.cpp" />
     <ClCompile Include="textConverter.cpp" />

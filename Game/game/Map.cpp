@@ -6,6 +6,7 @@ Map::Map()
 {
 	font.LoadDefault();
 
+	//**** MODELS
 	//1 barrels model
 	barrels.LoadModel("barrel/barrels.obj");
 	barrels.SetScale(0.33f);
@@ -69,33 +70,28 @@ Map::Map()
 	wall.SetScale(10.0f);
 	wall.SetToFloor(0);
 
-
-
 	// floor texture
-	//floor.LoadTexture("Map/floor2.bmp");
 	floor.LoadTexture("Map/floor.jpg");
 	floor.SetTiling(true);
 
-
+	// snowFlake model
+	snowFlake.LoadModel("snowFlake/snowFlake.obj");
+	snowFlake.SetY(50);
+	snowFlake.SetScale(0.35f);
 	
-
-	// coin model
-	rainDrop.LoadModel("snowFlake/snowFlake.obj");
-	rainDrop.SetY(50);
-	rainDrop.SetScale(0.35f);
-	
-
+	//Create 500 snowflakes on Game init loading 
 	for (int i = 0; i < 500; i++)
 	{
-		CModel* pShot = rainDrop.Clone();
-		pShot->SetColor(CColor::White());
-		pShot->SetPositionV(CVector(rand() % 3000, 2000, rand() % 3000));
-		rain.push_back(pShot);
+		CModel* snowFlakeClone = snowFlake.Clone();
+		snowFlakeClone->SetColor(CColor::White());
+		snowFlakeClone->SetPositionV(CVector(rand() % 3000, 2000, rand() % 3000));
+		snowFlakeList.push_back(snowFlakeClone);
 	}
 }
 
 void Map::init(int level)
 {
+	//clear Objects
 	collidingObjects.clear();
 	collidingObjects.delete_if(true);
 	mapCollision.delete_all();
@@ -103,12 +99,11 @@ void Map::init(int level)
 	modelList.delete_all();
 	modelList.delete_if(true);
 
-	gameLevel = level;
+	//game Level
+	localGameLevel = level;
+
+	//Load New Data 
 	LoadData();
- 
-
-
-
 }
 
 void Map::LoadData()
@@ -117,25 +112,20 @@ void Map::LoadData()
 	floor.SetSize(7500, 7500);
 	floor.SetPosition(0, 0, 0);
 
-	// move gameworld so that it starts at 0,0 and extends in positive xz-direction
-	//floor.SetPosition(floor.GetWidth() / 2, floor.GetDepth() / 2);
-
-	
-
 	//GAME LVL MAP
 	fstream myfile;
-	if(gameLevel == 1) myfile.open("level1.txt", ios_base::in);
-	else if (gameLevel == 2) myfile.open("level2.txt", ios_base::in);
-	else if (gameLevel == 3) myfile.open("level3.txt", ios_base::in);
+	if(localGameLevel == 1) myfile.open("gameLevels/level1.txt", ios_base::in);
+	else if (localGameLevel == 2) myfile.open("gameLevels/level2.txt", ios_base::in);
+	else if (localGameLevel == 3) myfile.open("gameLevels/level3.txt", ios_base::in);
 
+	//MAP CREATION BASED ON FILE CONTENT
 	int type, x, y, z, rot;
 	bool neof; // not end of file
 	do
 	{
 		myfile >> type >> x >> y >> z >> rot;
-
 		neof = myfile.good();
-		//cout << type << " " << x << " " << y << " " << z << " " << rot << endl;
+
 		if (neof) 
 		{
 			if (type == 1)   // barrels segments
@@ -252,6 +242,7 @@ void Map::LoadData()
 	myfile.close();
 }
 
+// *** UPDATE
 void Map::OnUpdate(Uint32 t, Player& player)
 {
 	localTime = t;
@@ -260,36 +251,35 @@ void Map::OnUpdate(Uint32 t, Player& player)
 	modelList.Update(t);
 }
 
-void Map::OnDraw(CGraphics* g) {   }
-
-
+//DRAW
 void Map::OnRender3D(CGraphics* g)
 {
-	//mapCollision.Draw(g);
 	collidingObjects.Draw(g);
 	floor.Draw(g);
 	modelList.Draw(g);
-	rain.Draw(g);
+	snowFlakeList.Draw(g);
 }
 
+//WEATHER CREATION
 void Map::weather()
 {
-	for (auto drop : rain)
+	//Just moving snowflake models up and down
+	for (auto snowFlake : snowFlakeList)
 	{
-		float y = drop->GetPositionV().GetY();
+		float y = snowFlake->GetPositionV().GetY();
 		float x = localPlayer->playerModel.GetX() + (rand() % 1500) - (rand() % 1500);
 		float z = localPlayer->playerModel.GetZ() + (rand() % 1000) - (rand() % 1000);
 
 		if (y < 50)
 		{
 			CVector pos = (CVector(x, 2000, z));
-			drop->SetPositionV(pos);
+			snowFlake->SetPositionV(pos);
 		}
 		else
 		{
 			y -= rand() % 80; //speed
-			drop->SetPosition(drop->GetX(), y, drop->GetZ());
+			snowFlake->SetPosition(snowFlake->GetX(), y, snowFlake->GetZ());
 		}
 	}
-	rain.Update(localTime);
+	snowFlakeList.Update(localTime);
 }

@@ -1,4 +1,6 @@
 #pragma once
+
+//Forward Declaration
 class Player;
 
 class Map
@@ -8,20 +10,29 @@ public:
 	//Main Functions
 	void init(int level);
 	void OnUpdate(Uint32 t, Player& player);
-	void OnDraw(CGraphics* g);
 	void OnRender3D(CGraphics* g);
 
+	//Map Objects (TO DO GETTERS SETTERS)
 	CModelList collidingObjects, mapCollision;
 private:
+	//Models
+	CModel barrels, tree, flowers, grass, hidingWall, house, iglo, mushroom, mountain, rock2, snowman, wall, snowFlake;
+	CModelList modelList, snowFlakeList;
+
+	//Westher
 	void weather();
+
+	//Map Loading
 	void LoadData();
 
+	//local Variables
 	Uint32 localTime;
-	CFloor floor;
- 
-	CModel barrels, tree, flowers, grass, hidingWall, house, iglo, mushroom, mountain, rock2, snowman, wall, rainDrop;
-	CModelList modelList, rain;
-	CFont font;
 	Player* localPlayer;
-	int gameLevel;
+	int localGameLevel;
+
+	//Game Floor
+	CFloor floor;
+
+	//fonts
+	CFont font;
 };

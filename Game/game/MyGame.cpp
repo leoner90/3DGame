@@ -1,113 +1,96 @@
 #include "headers/MyGame.h"
 #include "headers/Player/Player.h"
 #include "headers/Player/PlayerInterface.h"
-#include "headers/Enemy.h"
+#include "headers/AIPlayer.h"
 #include "headers/Map.h"
 #include "headers/Cutscene.h"
 #include "headers/loadingScreen.h"
 #include "headers/Radar.h"
 
-
 CMyGame::CMyGame()
 {
-	HideMouse();
+	HideMouse(); // :)
 }
+
 //*************** INIT ***************
 void CMyGame::OnInitialize()
 {
-	//SDL_WM_GrabInput(SDL_GRAB_ON);
-	HideMouse();
+	//Base init variables
 	currentMenuState = MAIN_MENU;
 	mainMenuOptionSelection = NEW_GAME;
 	SetGameMode(MODE_PAUSED);
-
+	curentGameLevel = 1;
 	localW = (float)Width;
 	localH = (float)Height;
+
+	//Fog & Light
+	Light.Enable();
+	font.LoadDefault();
+	EnableFog();
+
 	//Main Objects
 	map = new Map();
 	cutscene = new Cutscene(localW, localH);
 	player = new Player();
 	playerInterface = new PlayerInterface(localW, localH);
-	//dialogBox = new UIDialogBox(localW, localH);
+	radar = new Radar(localW, localH); // radar
 	loadingScreen = new LoadingScreen(localW, localH);
-	radar = new Radar(localW, localH);
-	//loading screen 
-	loadingScreen->init();
+	loadingScreen->init();	//loading screen init
+	
+	//SPRITES AND Models INIT
+	InitSpritesAndModels();
 
 	//music
 	mainBgMusic.Play("mainBg.wav", -1);
 	mainBgMusic.SetVolume(11);
-
-	//StartScreen Models
-	InitSpritesAndModels();
-	Light.Enable();
-	font.LoadDefault();
-	EnableFog();
  
-
-	
-	//enemies
-	AIPlayerModelOne = new CModelMd3();
-	AIPlayerModelTwo = new CModelMd3();
-
-	boss = new CModelMd3();
-	AIPlayerModelOne->LoadModel("enemies/lacky.md3");
-	AIPlayerModelOne->LoadTexture("enemies/lacky.png");
-	AIPlayerModelOne->SetScale(1.2f);
-
-	AIPlayerModelTwo->LoadModel("enemies/lacky.md3");
-	AIPlayerModelTwo->LoadTexture("enemies/lackyFriend.png");
-	AIPlayerModelTwo->SetScale(1.2f);
-
- 
-
-	boss->LoadModel("enemies/Bully.md3");
-	boss->SetScale(15.2f);
-	boss->LoadTexture("enemies/Bully.png");
-
-	curentGameLevel = 1;
+	//Mouse Init Controll
 	mousePointer.SetPosition(localW / 2, localH / 2 + 300);
-
+	HideMouse();
+	//SDL_WM_GrabInput(SDL_GRAB_ON);
 }
 
-
-
-//ON NEW GAME START
+//ON NEW LEVEL START
 void CMyGame::OnStartLevel(int level)
 {
+	// for final cutscene to draw map and player from Level 3!!!!
+	bool finalCutscene = false;
+	if (level > 3)
+	{
+		finalCutscene = true;
+		level = 3;
+	}
+
 	//Main inits
-	int mapLevel = level;
-	if (level == 4) mapLevel = 3; // just to show map on final cutscene
-	map->init(mapLevel);
+	map->init(level);
 	playerInterface->init(localW, localH); 
 	radar->init();
-	player->init(mapLevel);
+	player->init(level);
  
 	//resets
 	gameStarted = false;
 	SetGameMode(MODE_PAUSED);
 	deathScreenTimer = 0;
- 
-	weatherBgEffect.Pause();
 
-	//****ENEMIES clear
-	for (auto AIplayer : AIPlayers) delete AIplayer;
-	AIPlayers.clear();
+	//Wind Sound Pause
+	weatherBgSound.Pause();
+
+	//****AIplayer clear
+	for (auto AIplayer : AllAIPlayerList) delete AIplayer;
+	AllAIPlayerList.clear();
 
 	// spawn
-	enemySpawn(level);
+	if(!finalCutscene) AIplayersSpawn(level);
 	cutscene->init(localW, localH, *player);
-
 }
 
 //*************** UPDATE ***************
 void CMyGame::OnUpdate() 
 {
- 
 	Uint32 t = (float)GetTime();
 	currentMousePosToScreen = ScreenToFloorCoordinate(mousePointer.GetX(), mousePointer.GetY());
 
-	//end Of the game Win
+	//End Of the game Win
 	if (cutscene->curentCutSceneNum == 4 && !cutscene->isCutscenePlaying)
 	{
 		currentMenuState = MAIN_MENU;
@@ -115,35 +98,35 @@ void CMyGame::OnUpdate()
 		gameStarted = false;
 	}
 
-
-	//CUTSCENE
+	//END OF EACH CUTSCENE
 	if (!cutscene->isCutscenePlaying && currentMenuState == CUTSCENE && cutscene->curentCutSceneNum == curentGameLevel)
 	{
 		currentMenuState = IN_GAME;
-		camera.rotation.y = YcameraInitRotation;
+		camera.rotation.y = 0;
 		camera.position.z = 2000;
-		weatherBgEffect.Play("weather.wav", -1);
-		weatherBgEffect.SetVolume(150);
-		for (auto AIPlayer : AIPlayers) AIPlayer->OnSpawnHold = false;
+		weatherBgSound.Play("weather.wav", -1);
+		weatherBgSound.SetVolume(150);
+		for (auto AIPlayer : AllAIPlayerList) AIPlayer->OnSpawnHold = false;
 	}
 
+	//UPDATES IF CUSCENE RUNNING
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
 		map->OnUpdate(t, *player);
 		CVector playerWorldPos = player->playerModel.GetPositionV() + CVector(0, player->playerModel.GetTop(), 0);
-		player->OnUpdate(t, false, false, false, false, *map, AIPlayers, currentMousePosToScreen, WorldToScreenCoordinate(playerWorldPos), 0);
+		player->UpdateForCutscene(t, WorldToScreenCoordinate(playerWorldPos));
 		bool fullWidth = true;
 		
-		for (auto AiPlayer : AIPlayers)
+		for (auto AiPlayer : AllAIPlayerList)
 		{
-			CVector AiPlayerpos = AiPlayer->enemyModel->GetPositionV() + CVector(0, AiPlayer->enemyModel->GetTop(), 0);
-			AiPlayer->OnUpdate(GetTime(), *player, *map, AIPlayers, WorldToScreenCoordinate(AiPlayerpos));
+			CVector AiPlayerpos = AiPlayer->AIPlayerModel->GetPositionV() + CVector(0, AiPlayer->AIPlayerModel->GetTop(), 0);
+			AiPlayer->OnUpdate(GetTime(), *player, *map, AllAIPlayerList, WorldToScreenCoordinate(AiPlayerpos));
 		}
-		cutscene->Update(t, AIPlayers);
+		cutscene->Update(t, AllAIPlayerList);
 		return;
 	}
 
-	//Death Handler Move To function
+	//GAME OVER - Death Screen Handler  
 	if ((player->isPlayerDead) && gameStarted)
 	{
 		currentMenuState = DEATHSCREEN;
@@ -158,37 +141,37 @@ void CMyGame::OnUpdate()
 		gameStarted = false;
 	}
 
-	//LOADING_SCREEN 
+	//IF LOADING_SCREEN 
 	if(currentMenuState == LOADING_SCREEN) loadingScreen->Update(t);
 
 	//RETURN IF MENU MODE
 	if ( IsGameOver() || IsPaused() || IsMenuMode() || currentMenuState != IN_GAME) return; // IN GAME , when exit the game mode == exit rising bugs
 	
-	//Objects updates
+	//IF GAME RUNNING UPDATES
 	map->OnUpdate(t, *player);
-	player->OnUpdate(t, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), IsKeyDown(SDLK_w), IsKeyDown(SDLK_s), *map, AIPlayers, currentMousePosToScreen, WorldToScreenCoordinate(player->playerModel.GetPositionV()), camera.rotation.y);
+	player->OnUpdate(t, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), IsKeyDown(SDLK_w), IsKeyDown(SDLK_s), *map, AllAIPlayerList, currentMousePosToScreen, WorldToScreenCoordinate(player->playerModel.GetPositionV()), camera.rotation.y);
 	playerInterface->OnUpdate(t, *player);
-	radar->OnUpdate(t, AIPlayers, *player, *map);
+	radar->OnUpdate(t, AllAIPlayerList, *player, *map);
 	
  
 	//ALL AI PLAYERS
 	bool isEnemyAlive = false;
-	for (auto AiPlayer : AIPlayers)
+	for (auto AiPlayer : AllAIPlayerList)
 	{
-		if (!AiPlayer->isFriend) isEnemyAlive = true;
+		if (!AiPlayer->isFriend) isEnemyAlive = true; // If at least one enemy alive
 	
-		CVector AiPlayerpos = AiPlayer->enemyModel->GetPositionV() + CVector(0, AiPlayer->enemyModel->GetTop(), 0);
-		AiPlayer->OnUpdate(GetTime(), *player, *map, AIPlayers, WorldToScreenCoordinate(AiPlayerpos));
+		CVector AiPlayerpos = AiPlayer->AIPlayerModel->GetPositionV() + CVector(0, AiPlayer->AIPlayerModel->GetTop(), 0);
+		AiPlayer->OnUpdate(GetTime(), *player, *map, AllAIPlayerList, WorldToScreenCoordinate(AiPlayerpos));
 
-		//* if regular enemie dead -> delete;
-		
+		//* IF AIPlayer is dead -> delete;
 		if (AiPlayer->isDead)
 		{
 			delete AiPlayer;
-			AIPlayers.erase(find(AIPlayers.begin(), AIPlayers.end(), AiPlayer));
+			AllAIPlayerList.erase(find(AllAIPlayerList.begin(), AllAIPlayerList.end(), AiPlayer));
 		}
 	}
 
+	//IF NO ENEMY LEFT - START NEXT GAME LEVEL
 	if (!isEnemyAlive)
 	{
 		curentGameLevel++;
@@ -197,15 +180,14 @@ void CMyGame::OnUpdate()
 		gameStarted = true;
 		cutscene->startCutscene(curentGameLevel);
 		currentMenuState = CUTSCENE;
+
 	}
-
-
 }
 
 //*************** 2D RENDER ***************
 void CMyGame::OnDraw(CGraphics* g)
 {
-	// MENU MODE
+	// IF MENU MODE
 	if (IsPaused() || IsMenuMode())
 	{
 		if (currentMenuState == MAIN_MENU || currentMenuState == SHOW_CONTROLLERS) MaiMenuDraw(g);
@@ -214,12 +196,11 @@ void CMyGame::OnDraw(CGraphics* g)
 		return;
 	}
 
-	// CUTSCENE
+	// IF IN CUTSCENE
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
 		cutscene->Draw2d(g); 
-		for (auto AIPlayer : AIPlayers) AIPlayer->OnDraw(g);
-		map->OnDraw(g);
+		for (auto AIPlayer : AllAIPlayerList) AIPlayer->OnDraw(g);
 		player->OnDraw(g);
 		return;
 	}
@@ -232,20 +213,20 @@ void CMyGame::OnDraw(CGraphics* g)
 	player->OnDraw(g);
 	radar->OnDraw(g);
 	playerInterface->OnDraw(g);
-	for (auto AIPlayer : AIPlayers) AIPlayer->OnDraw(g);
+	for (auto AIPlayer : AllAIPlayerList) AIPlayer->OnDraw(g);
 }
 
 //*************** 3D RENDER ***************
 void CMyGame::OnRender3D(CGraphics* g)
 { 
+	//NOT IN GAME
 	if (IsGameOver() || IsPaused() || IsMenuMode()) return;
 
+	//IN GAME!
 	CameraControl(g);
 	map->OnRender3D(g);
-	cutscene->Draw3d(g);
 	player->OnRender3D(g);
-	for (auto AIPlayer : AIPlayers) AIPlayer->OnRender3D(g);
- 
+	for (auto AIPlayer : AllAIPlayerList) AIPlayer->OnRender3D(g);
 }
 
 //*************** CAMERA ***************
@@ -268,8 +249,7 @@ void CMyGame::CameraControl(CGraphics* g)
 	
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
-		if(curentGameLevel == 1) camera.rotation.y -= cutscene->camerRotationAngle;
-		if (curentGameLevel != 1) camera.rotation.y = cutscene->camerRotationAngle;
+		camera.rotation.y = cutscene->camerRotationAngle;
 		glRotatef(camera.rotation.y, 0, 1, 0);	// rotate game world around x-axis
 	}
 	else  glRotatef(camera.rotation.y, 0, 1, 0);	// rotate game world around x-axis
@@ -317,6 +297,23 @@ void CMyGame::InitSpritesAndModels()
 	//mouse Pointer 
 	mousePointer.LoadImage("mousePointer.png");
 	mousePointer.SetSize(20, 20);
+
+	//*** AIPlayers
+	AIPlayerModelOne = new CModelMd3();
+	AIPlayerModelTwo = new CModelMd3(); // Friend Model
+	boss = new CModelMd3();
+
+	AIPlayerModelOne->LoadModel("enemies/lacky.md3");
+	AIPlayerModelOne->LoadTexture("enemies/lacky.png");
+	AIPlayerModelOne->SetScale(1.2f);
+
+	AIPlayerModelTwo->LoadModel("enemies/lacky.md3");
+	AIPlayerModelTwo->LoadTexture("enemies/lackyFriend.png");
+	AIPlayerModelTwo->SetScale(1.2f);
+
+	boss->LoadModel("enemies/Bully.md3");
+	boss->SetScale(15.2f);
+	boss->LoadTexture("enemies/Bully.png");
 }
 
 
@@ -340,72 +337,54 @@ void CMyGame::EnableFog()
 }
 
 
-//*************** Main Menu Handler
-void CMyGame::MaiMenuDraw(CGraphics* g)
-{
-	if (currentMenuState == SHOW_CONTROLLERS) 
-	{
-		mainMenushowControlers.Draw(g);
-		font.DrawText((float)Width / 2 - 100,	(float)Height / 2 + 280, "CONTROLS", CColor::Black(), 52);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 200, "LEFT MOUSE BTN. - SHOOT", CColor::Black() , 22);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 150, "W / S / A / D  - MOVE CHARACTER", CColor::Black(), 22);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 100, "SPACE - USE SKILL", CColor::Black(), 22);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 , "E - INTERACT", CColor::Black(), 22);
-		font.DrawText((float)Width / 2 - 70.f, 100, "BACK", CColor::Black(), 42);
-	}
-	else 
-	{
-		startScreen.Draw(g);
-		font.DrawText((float)Width / 2 - 80.f, (float)Height / 2 + 100, "NEW GAME", mainMenuOptionSelection == NEW_GAME ? CColor::White() : CColor::Gray(), 45);
-		font.DrawText((float)Width / 2 - 80.f, (float)Height / 2  - 30 , "CONTROLS", mainMenuOptionSelection == CONTROLS ? CColor::White() : CColor::Gray(), 45);
-		font.DrawText((float)Width / 2 - 40.f, (float)Height / 2 - 160, "EXIT", mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
-	}
-}
- 
-
-void CMyGame::enemySpawn(int level)
+//AIPLAYERS SPAWN
+void CMyGame::AIplayersSpawn(int level)
 {
 	enum allEnemiesTypes { AIEnemy, AIFriend, BOSS };
+
+	//LEVEL 1
 	if (level == 1)
 	{
 		//Enemy Teams
 		for (int enemyIndex = 0; enemyIndex < 3; enemyIndex++)
 		{
-			AIPlayers.push_back(new Enemy());
-			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
+			AllAIPlayerList.push_back(new AIPlayer());
+			AllAIPlayerList.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
 		}
 		
 		//Friend Team
-		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
+		AllAIPlayerList.push_back(new AIPlayer());
+		AllAIPlayerList.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
 	}
 
+	//LEVEL 2
 	if ( level == 2)
 	{
 		//Enemy Teams 2 regular enemies + boss
 		for (int enemyIndex = 0; enemyIndex < 2; enemyIndex++)
 		{
-			AIPlayers.push_back(new Enemy());
-			AIPlayers.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
+			AllAIPlayerList.push_back(new AIPlayer());
+			AllAIPlayerList.back()->init(enemyIndex, AIEnemy, *map, *AIPlayerModelOne, curentGameLevel);
 		}
 		//boss
-		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(2, BOSS, *map, *boss, curentGameLevel);
+		AllAIPlayerList.push_back(new AIPlayer());
+		AllAIPlayerList.back()->init(2, BOSS, *map, *boss, curentGameLevel);
 	 
 		//Friend Team
-		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
+		AllAIPlayerList.push_back(new AIPlayer());
+		AllAIPlayerList.back()->init(0, AIFriend, *map, *AIPlayerModelTwo, curentGameLevel);
 	}
 
+	//LEVEL 3
 	if (level == 3)
 	{
 		//Enemy Teams 2 regular enemies + boss
-		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(0, AIEnemy, *map, *AIPlayerModelTwo, curentGameLevel);
+		AllAIPlayerList.push_back(new AIPlayer());
+		AllAIPlayerList.back()->init(0, AIEnemy, *map, *AIPlayerModelTwo, curentGameLevel);
 
 		//boss
-		AIPlayers.push_back(new Enemy());
-		AIPlayers.back()->init(1, BOSS, *map, *boss, curentGameLevel);
+		AllAIPlayerList.push_back(new AIPlayer());
+		AllAIPlayerList.back()->init(1, BOSS, *map, *boss, curentGameLevel);
 	}
 }
 
@@ -419,11 +398,33 @@ void CMyGame::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 	MainMenuController(sym);
 }
 
- 
+//*************** Main Menu DRAW
+void CMyGame::MaiMenuDraw(CGraphics* g)
+{
+	if (currentMenuState == SHOW_CONTROLLERS)
+	{
+		mainMenushowControlers.Draw(g);
+		font.DrawText((float)Width / 2 - 100, (float)Height / 2 + 280, "CONTROLS", CColor::Black(), 52);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 200, "LEFT MOUSE BTN. - SHOOT", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 150, "W / S / A / D  - MOVE CHARACTER", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 100, "SPACE - USE SKILL", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2, "E - INTERACT", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 70.f, 100, "BACK", CColor::Black(), 42);
+	}
+	else
+	{
+		startScreen.Draw(g);
+		font.DrawText((float)Width / 2 - 80.f, (float)Height / 2 + 100, "NEW GAME", mainMenuOptionSelection == NEW_GAME ? CColor::White() : CColor::Gray(), 45);
+		font.DrawText((float)Width / 2 - 80.f, (float)Height / 2 - 30, "CONTROLS", mainMenuOptionSelection == CONTROLS ? CColor::White() : CColor::Gray(), 45);
+		font.DrawText((float)Width / 2 - 40.f, (float)Height / 2 - 160, "EXIT", mainMenuOptionSelection == EXIT ? CColor::White() : CColor::Gray(), 45);
+	}
+}
 
+
+//MAIN MENU HANDLER
 void CMyGame::MainMenuController(SDLKey sym)
 {
-	// Call / Cancel Menu on ESC btn. pressed
+	//On ESC btn. pressed OPEN MAIN MENU - IF GAME STARTED
 	if (!IsPaused() && gameStarted && currentMenuState == IN_GAME)
 	{
 		if (sym == SDLK_ESCAPE)
@@ -433,9 +434,12 @@ void CMyGame::MainMenuController(SDLKey sym)
 			currentMenuState = MAIN_MENU;
 		}
 	}
-	else if (sym == SDLK_ESCAPE && gameStarted && currentMenuState == CUTSCENE)
-		cutscene->dialogNumber = 11; //skip dialog
 
+	//SKIP CUTSCENE
+	else if (sym == SDLK_ESCAPE && gameStarted && currentMenuState == CUTSCENE)
+		cutscene->cutsceneTimer = -1; //skip dialog
+
+	//RETURN TO THE GAME IF GAME STARTED
 	else if (IsPaused() && sym == SDLK_ESCAPE  && gameStarted && currentMenuState == MAIN_MENU)
 	{
 		HideMouse();
@@ -443,7 +447,7 @@ void CMyGame::MainMenuController(SDLKey sym)
 		currentMenuState = IN_GAME;
 	}
 
-	//LOADING COMPLETED
+	//LOADING COMPLETED AND ENTER PRESSED
 	if (sym == 13 && currentMenuState == LOADING_SCREEN && loadingScreen->loadingCompleted)
 	{
 		StartGame();
@@ -461,10 +465,11 @@ void CMyGame::MainMenuController(SDLKey sym)
 	{
 		if (sym == 13 || sym == SDLK_ESCAPE) currentMenuState = MAIN_MENU;
 	}
-	//******* IF MAIN_MENU
+
+	//*******  MAIN_MENU HANDLER
 	else if (currentMenuState == MAIN_MENU )
 	{
-		//Start
+		//Start NEW GAME
 		if (sym == 13 && mainMenuOptionSelection == NEW_GAME)
 		{
 			curentGameLevel = 1; // 1st level allways
@@ -478,7 +483,7 @@ void CMyGame::MainMenuController(SDLKey sym)
 		//SHOW CONTROLERS
 		if (sym == 13 && mainMenuOptionSelection == CONTROLS) currentMenuState = SHOW_CONTROLLERS;
 	 
-		//Exit
+		//EXIT
 		if (sym == 13 && mainMenuOptionSelection == EXIT) StopGame();
 
 		//Menu Scroller
@@ -495,6 +500,7 @@ void CMyGame::MainMenuController(SDLKey sym)
 	}
 }
 
+//MOUSE EVENTS
 void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLeft, bool bRight, bool bMiddle)
 {
 	//Prevents player from shooting behind the model

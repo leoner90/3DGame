@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "headers/Player/Player.h"
 #include "headers/map.h"
-#include "headers/Enemy.h"
+#include "headers/AIPlayer.h"
 
 
 
@@ -9,22 +9,20 @@
 
 Player::Player()
 {
-	dashVfx.LoadModel("snowFlake/snowFlake.obj");
-	dashVfx.SetScale(0.2f);
+	font.LoadDefault();
 
+	//On Damage VFX
 	onDamageVfx.LoadModel("snowFlake/snowFlake.obj");
 	onDamageVfx.SetScale(0.6f);
 
 	isPlayerDead = playerPreDeahAnimation = false;
-	font.LoadDefault();
+	
 
 	//model
 	playerModel.LoadModel("Player/main.md3");
 	playerModel.LoadTexture("Player/main.png");
-
 	playerModel.SetScale(2.f);
 
-	//main running 1 - 20, throwing 22 - 137 (frame 62 is a good pose to hold for charge), death 139 - 216  .
 	//animation
 	playerModel.AddAnimation("run", 1, 20);
 	playerModel.AddAnimation("precharge", 22, 62); //62 chargingFrame
@@ -60,6 +58,7 @@ Player::Player()
 //*************** INIT ***************
 void Player::init(int curentGameLevel)
 {
+	//possition
 	if (curentGameLevel == 1)
 	{
 		playerModel.SetPosition(2063, 0, -1074);
@@ -76,11 +75,9 @@ void Player::init(int curentGameLevel)
 		playerModel.SetRotation(270);
 	}
 
+	//init Animation
 	playerModel.PlayAnimation("idle", 20, true);
-	isPlayerMoving = false;
-	playerShots.delete_all();
-	playerCurrentState = UNOCCUPIED;
- 
+
 	//buffs
 	isPlayerInvulnerable = isPlayerUnderDistanceBuff = false;
 	InvulnerableBuffTimer = distanceBuffTimer = 0;
@@ -105,16 +102,19 @@ void Player::init(int curentGameLevel)
 	isShotCharged = false;
 	isPlayerInDash = false;
 	chargingAnimation = false;
+	isPlayerMoving = false;
 	InDamageStunDelayTimer = 0;
 	startChargedShotTimer = 0;
 	repeatStunDelayTimer = 0;
 	dashTimer = 0;
 	footsteps.Pause();
+	playerShots.delete_all();
+	playerCurrentState = UNOCCUPIED;
 
 	//shooting reset
 	totalTimeToCharge = 1500;
 
-	//loot
+	//loot => buffs
 	randomLootTimer = 0;
 	lootTimerOffset = 15000; // evry 30 sec loot apears
 	rangeOfAttack = 100;
@@ -124,20 +124,17 @@ void Player::init(int curentGameLevel)
 }
 
 //*************** UPDATE ***************
-void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<Enemy*> AllEnemies, CVector& mousePos, CVector playerWorldPos,float cameraYrot)
+void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map& map, std::vector<AIPlayer*> AllAIPlayers, CVector& mousePos, CVector playerWorldPos,float cameraYrot)
 {
-	UIDialogBox::OnUpdate(t, playerWorldPos);
-	playerModel.Update(t);
-	if(playerCurrentState == CUTSCENE) return;
 	//shots
 	playerShotsHandler();
 
 	//if dead -> return (do nothing)
 	if (isPlayerDead) return;
 
-	//mirroring
+	//mirroring variables
 	localMouse = &mousePos; 
-	localEnemies = AllEnemies;
+	localAllAIPlayers = AllAIPlayers;
 	localMap = &map;
 	localTime = t;
 	localcameraYrot = cameraYrot;
@@ -146,7 +143,6 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	deltatime = (t - prevFrameTime) / 1000  ; //in sec
 	prevFrameTime = t;
  
-
 	//DEATH HANDLER
 	float remainingHpInPercentage = playerCurrentHp / (playerMaxHp / 100);
 	playerModel.SetHealth(remainingHpInPercentage);
@@ -179,6 +175,7 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 		playerCurrentState = savedPrevPlayerState;
 	} 
 
+	//Delete -Update Shots And VFX if Deleted
 	playerShots.delete_if(true);
 	playerShots.Update(t);
 
@@ -208,7 +205,7 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	}
 	
 	//control & collisions
-	playerCollision(AllEnemies);
+	playerCollision(AllAIPlayers);
 	PlayerControl(Dkey, Akey, Wkey, Skey);
 
 	//loot
@@ -223,8 +220,6 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	lastFramePos = playerModel.GetPositionV();
 	playerModel.Update(t);
 
-	dashEffect.Update(t);
-	dashEffect.delete_if(true);
 }
 
 //*************** 2D RENDER ***************
@@ -239,19 +234,22 @@ void Player::OnRender3D(CGraphics* g)
 	playerShots.Draw(g);
 	playerModel.Draw(g);
 	lootList.Draw(g);
-	dashEffect.Draw(g);
 	onHitEffect.Draw(g);
 }
 
- 
+void Player::UpdateForCutscene(UINT32 t, CVector playerWorldPos)
+{
+	//Final Cutscene Update player animation And Dialog Box
+	UIDialogBox::OnUpdate(t, playerWorldPos);
+	playerModel.Update(t);
+}
 
 //*************** PLAYER CONTROLER ***************
 void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 {
-	if (playerCurrentState == INDASH )
-	{
+	if (playerCurrentState == INDASH) //ROLL
 		playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 30);
-	}
+	
 
 	if (playerModel.AnimationFinished() && playerCurrentState == INDASH)
 	{
@@ -317,8 +315,6 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
 		isPlayerMoving = true;
-
-
 	}
 	else if (Skey)
 	{
@@ -335,14 +331,13 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	if (Akey ) { playerModel.Rotate(6); playerModel.SetDirection(playerModel.GetRotation()); }
 	if (Dkey ) { playerModel.Rotate(-6); playerModel.SetDirection(playerModel.GetRotation()); }
 	
- 	
 	playerModel.SetDirectionV(playerModel.GetRotationV());
 }
 
-
+//*** KEYBOARD EVENTS
 void Player::OnKeyDown(SDLKey sym, CVector currentMousePos)
 {
-	if (sym == SDLK_SPACE)
+	if (sym == SDLK_SPACE) //ROLL SKILL
 	{
 		if (dashCoolDown < localTime && playerCurrentState != INDASH)
 		{
@@ -353,11 +348,11 @@ void Player::OnKeyDown(SDLKey sym, CVector currentMousePos)
 			dashSound.SetVolume(75);
 			playerModel.PlayAnimation("dash", 60, false);			
 			playerModel.SetSpeed(0);
-
 		}
 	}
 }
 
+//*** CHARGED SHOT
 void Player::chargedShotHandler()
 {
 	if (startChargedShotTimer != 0 && !isShotCharged)
@@ -373,13 +368,15 @@ void Player::chargedShotHandler()
 	}
 }
 
+//*** GETTING DAMAGE
 void Player::playerGettingDamage(float damage)
 {
-	return;
+	//return;
 	if (playerPreDeahAnimation || isPlayerInvulnerable) return;
 
 	playerCurrentHp -= damage;
 
+	//Hit Effect
 	for (int i = 0; i < 55; i++)
 	{
 		CModel* p = onDamageVfx.Clone();
@@ -391,7 +388,7 @@ void Player::playerGettingDamage(float damage)
 		onHitEffect.push_back(p);
 	}
 
-
+	//Pre-Death handler
 	if (playerCurrentHp <= 0)
 	{
 		playerShots.clear();
@@ -399,7 +396,7 @@ void Player::playerGettingDamage(float damage)
 		playerPreDeahAnimation = true;
 		deathSound.Play("Death.wav", 1);
 	}
-	else
+	else //Hit
 	{
 		if (repeatStunDelayTimer < localTime)
 		{
@@ -416,9 +413,10 @@ void Player::playerGettingDamage(float damage)
 	}
 }
 
-void Player::playerCollision(std::vector<Enemy*> AllEnemies)
+//*** COLLISIONS
+void Player::playerCollision(std::vector<AIPlayer*> AllAIPlayers)
 {
-	//end of the map
+	//End of the map Collisions
 	for (auto wallSeg : localMap->mapCollision)
 	{
 		if (playerModel.HitTest(wallSeg))
@@ -427,7 +425,7 @@ void Player::playerCollision(std::vector<Enemy*> AllEnemies)
 		}
 	}
 
-	//map objects
+	//Map objects Collisions
 	for (auto collidingObj : localMap->collidingObjects)
 	{
 		float distance = 200;
@@ -440,18 +438,20 @@ void Player::playerCollision(std::vector<Enemy*> AllEnemies)
 		if (distance == 0) if (playerModel.HitTest(collidingObj)) playerModel.SetPositionV(lastFramePos);
 	}
 	 
-	//enemies
-	for (auto enemy : AllEnemies) {
-		if (enemy->preDeahAnimation) continue;
-		if (playerModel.HitTest(enemy->enemyModel)) 
+	//Enemies Collisions
+	for (auto AIPlayer : AllAIPlayers) {
+		if (AIPlayer->preDeahAnimation) continue;
+		if (playerModel.HitTest(AIPlayer->AIPlayerModel))
 		{
 			playerModel.SetPositionV(lastFramePos);
 		}
 	}
 }
 
+//*** BUFF => LOOT 
 void Player::addLoot()
 {
+	//Create Random Loot at Random Position
 	randomLootTimer = localTime + rand() % lootTimerOffset + 10000;
 	CVector possitionsAllowed[9] =
 	{
@@ -475,7 +475,7 @@ void Player::addLoot()
 	lootList.back()->SetPositionV(possitionsAllowed[rand() % 9]);
 	lootList.back()->SetStatus(typeOfloot);
 }
-
+//*** CREATE SHOT
 void Player::performShot()
 {
 	//playerCurrentState = INATTACK;
@@ -505,8 +505,10 @@ void Player::performShot()
 
 }
 
+//*** SHOT HANDLER
 void Player::playerShotsHandler()
 {
+	//Shot Collision With The Map
 	for (CModel* pShot : playerShots)
 	{
 		for (auto mapObj : localMap->collidingObjects)
@@ -518,13 +520,15 @@ void Player::playerShotsHandler()
 			}
 		}
 
+		//Gravity
 		float gravity = 20;
 		pShot->SetYVelocity(pShot->GetYVelocity() - gravity);
 
-		for (auto enemy : localEnemies)
+		//Shot Collision With AIPlayers
+		for (auto enemy : localAllAIPlayers)
 		{
 			if (enemy->isFriend) continue;
-			if (pShot->HitTest(enemy->enemyModel->GetPositionV(), 150)) //add distance
+			if (pShot->HitTest(enemy->AIPlayerModel->GetPositionV(), 150)) //add distance
 			{
 				if (enemy->preDeahAnimation) continue;
 				pShot->Delete();
@@ -544,6 +548,7 @@ void Player::playerShotsHandler()
 	}
 }
 
+//*** BUFF ON PICK UP
 void Player::lootHandler()
 {
 	//LOOT - DROP
@@ -574,6 +579,7 @@ void Player::lootHandler()
 	}
 }
 
+//*** BUFF Reset
 void Player::buffHandler()
 {
 	if (InvulnerableBuffTimer < localTime) isPlayerInvulnerable = false;
@@ -581,6 +587,7 @@ void Player::buffHandler()
 }
 
 
+//*** Mouse Evenets
 void Player::OnRButtonDown(long t)
 {
 	if (playerCurrentState == UNOCCUPIED && !playerPreDeahAnimation)
