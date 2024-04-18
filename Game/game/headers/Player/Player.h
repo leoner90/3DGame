@@ -27,6 +27,7 @@ public:
 
 	//Collisions Handler
 	void playerCollision(std::vector<AIPlayer*> AllAIPlayers);
+	
 
 	//Loots
 	void addLoot();

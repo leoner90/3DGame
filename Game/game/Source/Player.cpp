@@ -246,7 +246,22 @@ void Player::UpdateForCutscene(UINT32 t, CVector playerWorldPos)
 void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 {
 	if (playerCurrentState == INDASH) //ROLL
-		playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 30);
+	{
+		for (int n = 0; n < 30; n++)
+		{
+			playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV());
+			
+			for (auto wallSeg : localMap->mapCollision)
+			{
+				if (playerModel.HitTest(wallSeg))
+				{
+					playerModel.SetPositionV(lastFramePos);
+
+					break;
+				}
+			}
+		}
+	}
 	
 
 	if (playerModel.AnimationFinished() && playerCurrentState == INDASH)
@@ -259,54 +274,54 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 
 	//moving direction
 
-	/*
-	if (Wkey)
-	{
-		playerModel.SetSpeed(650);
-		playerModel.PlayAnimation("run", 22, true);
-		isPlayerMoving = true;
-		//playerModel.SetDirection(0, -1);
-		playerModel.SetDirection(0,-1);
-		
-		if(Akey) playerModel.SetDirection(-1, -1);
-		else if(Dkey) playerModel.SetDirection(1, -1);
-	}
-	else if (Skey)
-	{
-		isPlayerMoving = true;
-		playerModel.SetSpeed(450);
-		playerModel.PlayAnimation("run", 22, true);
-		playerModel.SetDirection(0, 1);
+	
+	//if (Wkey)
+	//{
+	//	playerModel.SetSpeed(650);
+	//	playerModel.PlayAnimation("run", 22, true);
+	//	isPlayerMoving = true;
+	//	//playerModel.SetDirection(0, -1);
+	//	playerModel.SetDirection(0,-1);
+	//	
+	//	if(Akey) playerModel.SetDirection(-1, -1);
+	//	else if(Dkey) playerModel.SetDirection(1, -1);
+	//}
+	//else if (Skey)
+	//{
+	//	isPlayerMoving = true;
+	//	playerModel.SetSpeed(450);
+	//	playerModel.PlayAnimation("run", 22, true);
+	//	playerModel.SetDirection(0, 1);
 
-		if (Akey) playerModel.SetDirection(-1, 1);
-		else if (Dkey) playerModel.SetDirection(1, 1);
-	}
+	//	if (Akey) playerModel.SetDirection(-1, 1);
+	//	else if (Dkey) playerModel.SetDirection(1, 1);
+	//}
 
-	 
-	else if (Akey)
-	{
-		playerModel.SetSpeed(650);
-		playerModel.PlayAnimation("run", 22, true);
-		playerModel.SetDirection(-1,0);
-		//	playerModel.SetRotation(abs(localcameraYrot) - 90);
-	}
-	else if (Dkey)
-	{
-		playerModel.SetSpeed(650);
-		playerModel.PlayAnimation("run", 22, true);
-		playerModel.SetDirection(1, 0);
- 
-	}
+	// 
+	//else if (Akey)
+	//{
+	//	playerModel.SetSpeed(650);
+	//	playerModel.PlayAnimation("run", 22, true);
+	//	playerModel.SetDirection(-1,0);
+	//	//	playerModel.SetRotation(abs(localcameraYrot) - 90);
+	//}
+	//else if (Dkey)
+	//{
+	//	playerModel.SetSpeed(650);
+	//	playerModel.PlayAnimation("run", 22, true);
+	//	playerModel.SetDirection(1, 0);
+ //
+	//}
 
-	else
-	{
-		footsteps.Pause();
-		playerModel.SetSpeed(0);
-		isPlayerMoving = false;
-		playerModel.PlayAnimation("idle", 20, true);
-	}
-	playerModel.SetRotation(playerModel.GetDirection());
-	*/
+	//else
+	//{
+	//	footsteps.Pause();
+	//	playerModel.SetSpeed(0);
+	//	isPlayerMoving = false;
+	//	playerModel.PlayAnimation("idle", 20, true);
+	//}
+	//playerModel.SetRotation(playerModel.GetDirection());
+	//
 	
 	if (Wkey)
 	{
@@ -414,12 +429,14 @@ void Player::playerGettingDamage(float damage)
 //*** COLLISIONS
 void Player::playerCollision(std::vector<AIPlayer*> AllAIPlayers)
 {
+	
 	//End of the map Collisions
 	for (auto wallSeg : localMap->mapCollision)
 	{
 		if (playerModel.HitTest(wallSeg))
 		{
 			playerModel.SetPositionV(lastFramePos);
+			
 		}
 	}
 
@@ -427,9 +444,10 @@ void Player::playerCollision(std::vector<AIPlayer*> AllAIPlayers)
 	for (auto collidingObj : localMap->collidingObjects)
 	{
 		float distance = 200;
-		if (collidingObj->GetStatus() == 6) distance = 400; // if house
-		if (collidingObj->GetStatus() == 1 ) distance = 200; // if iglo or barrel
-		if ( collidingObj->GetStatus() == 7) distance = 0; // if iglo 
+		if (collidingObj->GetStatus() == 6) { distance = 400;  }// if house
+		else if (collidingObj->GetStatus() == 1) { distance = 200;  }// if iglo or barrel
+		else if (collidingObj->GetStatus() == 7) { distance = 0; }// if iglo 
+		
 
 		//Iglo have very strange behavior if apply distance......
 		if (distance != 0) if (playerModel.HitTest(collidingObj->GetPositionV(), distance)) playerModel.SetPositionV(lastFramePos);

@@ -1,0 +1,10 @@
+﻿  AIPlayer.cpp
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(78,12): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(159,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(160,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(183,20): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(184,21): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(196,97): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(262,27): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(270,39): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  game.vcxproj -> C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\Debug\GTECgame.exe

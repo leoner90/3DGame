@@ -455,6 +455,7 @@ void AIPlayer::AIPlayersInitAnimations()
 {
 	if (localEnemyType == 0)
 	{
+		enemyMaxHp = enemyCurrentHp = 3;
 		AIPlayerModel->AddAnimation("run", 1, 36);
 		AIPlayerModel->AddAnimation("attack", 36, 142);
 		AIPlayerModel->AddAnimation("dead", 144, 211);
@@ -474,8 +475,8 @@ void AIPlayer::AIPlayersInitAnimations()
 	{
 		enemyMaxHp = enemyCurrentHp = 8;
 		AIPlayerModel->AddAnimation("run", 1, 22);
-		AIPlayerModel->AddAnimation("attack", 138, 240);
-		AIPlayerModel->AddAnimation("dead", 24, 124);
-		AIPlayerModel->AddAnimation("idle", 138, 155);
+		AIPlayerModel->AddAnimation("attack", 40, 144);
+		AIPlayerModel->AddAnimation("dead", 149, 258);
+		AIPlayerModel->AddAnimation("idle", 40, 57);
 	}
 }
