@@ -170,9 +170,13 @@ protected:
 	int numObjFrames;
 
 
+	int What;
+
 
 public:
 	
+	void SetWhat(int WHY) { What = WHY; }
+	int GetWhat() { return What; }
 	// Position functions
 	float GetX()								{ return Position.x; }
 	float GetY()								{ return Position.y; }

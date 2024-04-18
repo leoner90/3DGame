@@ -259,6 +259,22 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 
 					break;
 				}
+
+				for (auto collidingObj : localMap->collidingObjects)
+				{
+					if (collidingObj->GetWhat() != 23)
+					{
+						float distance = 200;
+						if (collidingObj->GetStatus() == 6) { distance = 400; }// if house
+						else if (collidingObj->GetStatus() == 1) { distance = 200; }// if iglo or barrel
+						else if (collidingObj->GetStatus() == 7) { distance = 0; }// if iglo 
+
+
+						//Iglo have very strange behavior if apply distance......
+						if (distance != 0) if (playerModel.HitTest(collidingObj->GetPositionV(), distance)) { playerModel.SetPositionV(lastFramePos); break; }
+						if (distance == 0) if (playerModel.HitTest(collidingObj)) { playerModel.SetPositionV(lastFramePos); break; }
+					}
+				}
 			}
 		}
 	}

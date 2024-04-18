@@ -169,6 +169,7 @@ void Map::LoadData()
 			if (type == 5) // hidingWalls
 			{
 				CModel* hidingWalls = hidingWall.Clone();
+				hidingWalls->SetWhat(23);
 				hidingWalls->SetPosition((float)x, (float)y - 30, (float)z);
 				hidingWalls->SetRotation((float)rot);
 				hidingWalls->SetStatus(5); // indicate the type of object
