@@ -14,7 +14,7 @@ UIDialogBox::UIDialogBox()
 	hideInSec = 0;
 
 	//SPEAKERS
-	name[0] = "Petr"; // regular enemy
+	name[0] = "Peter"; // regular enemy
 	name[1] = "Victor"; // regular enemy
 	name[2] = "Bob"; // regular enemy
 	name[3] = "Shinma (Boss)";// BOSS
@@ -41,9 +41,9 @@ UIDialogBox::UIDialogBox()
 	text[10] = "Prepare for defeat \nonce more \nmark my words."; //friend
 
 	//levele 3 Cutscene 3 Friend  Betrayal
-	text[11] = "I don’t need \nyou anymore, \nyou naive fool";
-	text[12] = "Your reign as king \nhas gone for \nfar too long.";
-	text[13] = "Now, WE rule \nthis playground!!”.";
+	text[11] = "I don’t need \n you anymore, \n you naive fool";
+	text[12] = "I have been hiding \n my power for \n far too long.";
+	text[13] = "   Witness!\n As WE rule \n this playground!!”.";
 
 	//levele 3 start dialogues
 	text[14] = "Let's chill him \nout, my new friend, \nFor the victory! ";

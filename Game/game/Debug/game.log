@@ -2,100 +2,11 @@
 C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(78,12): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
 C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(159,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(160,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(183,20): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(184,21): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(196,97): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(262,27): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(270,39): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  Cutscene.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Cutscene.cpp(45,14): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-  Map.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Map.cpp(87,68): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Map.cpp(87,47): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-  MyGame.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(66,32): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(66,24): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(90,11): warning C4244: 'initializing': conversion from 'float' to 'Uint32', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(91,90): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(91,69): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(323,9): warning C4101: 'filter': unreferenced local variable
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(407,59): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(407,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(408,61): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(408,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(409,61): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(409,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(410,61): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(410,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(411,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(411,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(412,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(417,60): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(417,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(418,60): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(418,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(419,60): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\MyGame.cpp(419,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Player.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(142,18): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(146,24): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(163,75): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(186,21): warning C4553: '==': result of expression not used; did you intend '='?
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(374,29): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(390,58): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(413,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(414,28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(434,32): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(436,33): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(487,57): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(490,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(490,16): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(491,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(491,15): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(492,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(492,16): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(493,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(493,17): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(494,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(494,15): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(495,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(495,16): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(496,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(496,14): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(497,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(497,17): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(498,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(498,16): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(501,19): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(508,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(525,47): warning C4552: '+': result of expression not used
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(596,39): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\Player.cpp(603,35): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-  PlayerInterface.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(67,14): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(71,24): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(74,79): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(84,26): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(105,99): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(105,39): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(105,26): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(111,95): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(111,39): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\PlayerInterface.cpp(111,26): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Radar.cpp
-  UIDialogBox.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\UIDialogBox.cpp(60,14): warning C4244: '=': conversion from 'long' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\UIDialogBox.cpp(84,61): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\UIDialogBox.cpp(84,36): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  loadingScreen.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\loadingScreen.cpp(37,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\loadingScreen.cpp(44,60): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\loadingScreen.cpp(48,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\loadingScreen.cpp(62,28): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\loadingScreen.cpp(64,24): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  main.cpp
-  textConverter.cpp
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\textConverter.cpp(22,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\textConverter.cpp(22,18): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Generating Code...
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(184,20): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(185,21): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(197,97): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(269,73): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(270,32): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\game\Source\AIPlayer.cpp(279,39): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+MSVCRTD.lib(initializers.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
   game.vcxproj -> C:\Users\Light\Documents\Games Programming\3dgame\3DGame\Game\Debug\GTECgame.exe

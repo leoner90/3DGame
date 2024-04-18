@@ -169,7 +169,8 @@ void AIPlayer::EnemyGetDamage(float damage)
 	if (enemyCurrentHp <= 0)
 	{
 		snowBallList.clear();
-		deathSound.Play("Death.wav");
+		if (localEnemyType == 2) deathSound.Play("bossdeath.wav");
+		else deathSound.Play("Death.wav");
 		deathSound.SetVolume(50);
 		preDeahAnimation = true;
 	}
@@ -204,9 +205,11 @@ void AIPlayer::AIPlayerControl()
 
 void AIPlayer::Attack()
 {
+
 	if (attackDelay < localTime)
 	{
-		AIPlayerModel->PlayAnimation("attack", 22, true);
+		if (localGameLvl == 3 && localEnemyType == 0) AIPlayerModel->PlayAnimation("attack", 44, true);
+		else AIPlayerModel->PlayAnimation("attack", 22, true);
 
 		//!!!!! NOT EFFECTIVE AS IT CHECK POSSITION ALL THE TIME INSTEAD OF DOING IT ONCE (when actual attack happens), 
 		// BUT IT ROTATES ATTACK ANIMATION TOWARDS TARGET EVERY FRAME WHICH LOOK NICE!!!! 
@@ -257,9 +260,14 @@ void AIPlayer::Attack()
 		AIPlayerModel->SetDirectionAndRotationToPoint(targetPos.GetX(), targetPos.GetZ());
 
 		//if end Of animation, throw snowball
-		if (AIPlayerModel->GetFrame() < 90) return; // attack by the end of the attack animations
-		
-		attackDelay = localTime + 3000;
+		if (AIPlayerModel->GetFrame() < 90)
+		{
+			return; // attack by the end of the attack animations
+			
+		}
+
+		if (localGameLvl == 3 && localEnemyType == 0) attackDelay = localTime + 1500;
+		else attackDelay = localTime + 3000;
 		flyTime = closestDistance / 1000.f;
 
 		//Shot
@@ -455,7 +463,8 @@ void AIPlayer::AIPlayersInitAnimations()
 {
 	if (localEnemyType == 0)
 	{
-		enemyMaxHp = enemyCurrentHp = 3;
+		if (localGameLvl == 3) enemyMaxHp = enemyCurrentHp = 6;
+		else enemyMaxHp = enemyCurrentHp = 3;
 		AIPlayerModel->AddAnimation("run", 1, 36);
 		AIPlayerModel->AddAnimation("attack", 36, 142);
 		AIPlayerModel->AddAnimation("dead", 144, 211);
@@ -464,7 +473,7 @@ void AIPlayer::AIPlayersInitAnimations()
 	//friend
 	if (localEnemyType == 1)
 	{
-		enemyMaxHp = enemyCurrentHp = 6;
+		enemyMaxHp = enemyCurrentHp = 3;
 		AIPlayerModel->AddAnimation("run", 1, 36);
 		AIPlayerModel->AddAnimation("attack", 36, 142);
 		AIPlayerModel->AddAnimation("dead", 144, 211);
