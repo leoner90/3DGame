@@ -45,7 +45,7 @@ void CMyGame::OnInitialize()
 	mainBgMusic.SetVolume(11);
  
 	//Mouse Init Controll
-	mousePointer.SetPosition(localW / 2, localH / 2 + 300);
+	mousePointer.SetPosition(localW / 2, localH / 2 + 265);
 	HideMouse();
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 }
@@ -54,13 +54,8 @@ void CMyGame::OnInitialize()
 void CMyGame::OnStartLevel(int level)
 {
 	// for final cutscene to draw map and player from Level 3!!!!
-	bool finalCutscene = false;
-	if (level > 3)
-	{
-		finalCutscene = true;
-		level = 3;
-	}
-
+	if (level > 3) level = 3;
+ 
 	//Main inits
 	map->init(level);
 	playerInterface->init(localW, localH); 
@@ -79,8 +74,8 @@ void CMyGame::OnStartLevel(int level)
 	for (auto AIplayer : AllAIPlayerList) delete AIplayer;
 	AllAIPlayerList.clear();
 
-	// spawn
-	if(!finalCutscene) AIplayersSpawn(level);
+	// spawn! -  if not a final Final Cutscene (4)
+	if(curentGameLevel < 4) AIplayersSpawn(level);
 	cutscene->init(localW, localH, *player);
 }
 
@@ -232,10 +227,6 @@ void CMyGame::OnRender3D(CGraphics* g)
 //*************** CAMERA ***************
 void CMyGame::CameraControl(CGraphics* g)
 {
-	// ------ Global Transformation Functions -----
-	//glScalef(world.scale, world.scale, world.scale);  // scale the game world
-	//glTranslatef(world.position.x, world.position.y, world.position.z);  // translate game world
-
 	if (currentMenuState == CUTSCENE && gameStarted)
 	{
 		glTranslatef(0, 0, cutscene->cutcceneCameraPosition.GetZ() + cutscene->cameraOffset);		//zzzzz
@@ -256,9 +247,8 @@ void CMyGame::CameraControl(CGraphics* g)
 
 	if (currentMenuState == CUTSCENE && gameStarted ) glTranslatef(0, -cutscene->cutcceneCameraPosition.GetY() - 800 ,  0);
 	else  
-		glTranslatef(0, -player->playerModel.GetY() + 0 - camera.position.y, 0);
-		//glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 	
-		
+		glTranslatef(0, -player->playerModel.GetY() + 0 - camera.position.y, 0); //glRotatef(-player->playerModel.GetDirection() + 90, 0, 1, 0); 
+			
 	// it makes the skydome stationary / draw the skydome before game world is translated
 	skydome.Draw(g);
 	
@@ -296,7 +286,7 @@ void CMyGame::InitSpritesAndModels()
 
 	//mouse Pointer 
 	mousePointer.LoadImage("mousePointer.png");
-	mousePointer.SetSize(20, 20);
+	mousePointer.SetSize(28, 28);
 
 	//*** AIPlayers
 	AIPlayerModelOne = new CModelMd3();
@@ -405,10 +395,10 @@ void CMyGame::MaiMenuDraw(CGraphics* g)
 	{
 		mainMenushowControlers.Draw(g);
 		font.DrawText((float)Width / 2 - 100, (float)Height / 2 + 280, "CONTROLS", CColor::Black(), 52);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 200, "LEFT MOUSE BTN. - SHOOT", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 200, "RIGHT MOUSE BTN. - SHOOT / CHARGE", CColor::Black(), 22);
 		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 150, "W / S / A / D  - MOVE CHARACTER", CColor::Black(), 22);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 100, "SPACE - USE SKILL", CColor::Black(), 22);
-		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2, "E - INTERACT", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2 + 100, "SPACE - USE SKILL (Tumble)", CColor::Black(), 22);
+		font.DrawText((float)Width / 2 - 220.f, (float)Height / 2, "ESC - MENU", CColor::Black(), 22);
 		font.DrawText((float)Width / 2 - 70.f, 100, "BACK", CColor::Black(), 42);
 	}
 	else
@@ -503,27 +493,8 @@ void CMyGame::MainMenuController(SDLKey sym)
 //MOUSE EVENTS
 void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLeft, bool bRight, bool bMiddle)
 {
-	/*
-	//Prevents player from shooting behind the model
-	 if (y < localH / 2 + 100)
-	{
-		mousePointer.SetPosition(x, localH / 2 + 120);
-		currentMousePos = CVector{ (float)x, 0 ,(float)localH / 2 + 120 };
-	}
-	else if (y > localH - 140)
-	{
-		mousePointer.SetPosition(x, localH - 150);
-		currentMousePos = CVector{ (float)x, 0 ,(float)localH - 150 };
-	}
-	else
-	{
-		mousePointer.SetPosition(x, y);
-		currentMousePos = CVector{ (float)x, 0 ,(float)y };
-	} 
-	*/
- 
-	float sensitivity = 0.07f;
 
+	float sensitivity = 0.07f;
 	static float avgrelx = 0;
 	static float avgrely = 0;
 
@@ -531,10 +502,6 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 	// weighted everage between past and current values
 	avgrelx = 0.75 * avgrelx + 0.25 * (float)relx;
 	avgrely = 0.75 * avgrely + 0.25 * (float)rely;
-
- 
- 
-	//player->playerModel.Rotate(-sensitivity * avgrelx); player->playerModel.SetDirection(player->playerModel.GetRotation());
  
 	camera.rotation.y += sensitivity * avgrelx;
 
@@ -542,10 +509,6 @@ void CMyGame::OnMouseMove(Uint16 x, Uint16 y, Sint16 relx, Sint16 rely, bool bLe
 	camera.rotation.x += -sensitivity * avgrely;
 	if (camera.rotation.x < 0) camera.rotation.x = 0;
 	if (camera.rotation.x > 80) camera.rotation.x = 80;
-
-	//if (camera.rotation.y > 360 || camera.rotation.y < -360) camera.rotation.y = 0;
-
- 
 }
 
 void CMyGame::OnRButtonDown(Uint16 x, Uint16 y)

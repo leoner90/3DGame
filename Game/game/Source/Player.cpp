@@ -108,7 +108,7 @@ void Player::init(int curentGameLevel)
 	footsteps.Pause();
 	playerShots.delete_all();
 	playerCurrentState = UNOCCUPIED;
-
+	playerModel.SetSpeed(0);
 	//shooting reset
 	totalTimeToCharge = 1500;
 
@@ -196,15 +196,19 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 	//charged Shot
 	chargedShotHandler();
 
-	if (isPlayerInDamage || playerCurrentState == INATTACK)
-	{
-		playerModel.Update(t);
-		return;
-	}
+	//Update and save Player Pos
+	lastFramePos = playerModel.GetPositionV();
+	playerModel.Update(t);
+
+	//return if in damage or in Attack
+	if (isPlayerInDamage || playerCurrentState == INATTACK) return;
+ 
 	
-	//control & collisions
-	playerCollision(AllAIPlayers);
+	//Movement controller
 	PlayerControl(Dkey, Akey, Wkey, Skey);
+
+	//collisions
+	playerCollision(AllAIPlayers);
 
 	//loot
 	lootHandler();
@@ -214,10 +218,6 @@ void Player::OnUpdate(Uint32 t, bool Dkey, bool Akey, bool Wkey, bool Skey, Map&
 
 	//remove buff effects when time is finished
 	buffHandler();
-
-	lastFramePos = playerModel.GetPositionV();
-	playerModel.Update(t);
-
 }
 
 //*************** 2D RENDER ***************
@@ -249,7 +249,6 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	if (playerCurrentState == INDASH) //ROLL
 		playerModel.SetPositionV(playerModel.GetPositionV() + playerModel.GetDirectionV() * 30);
 	
-
 	if (playerModel.AnimationFinished() && playerCurrentState == INDASH)
 	{
 		isPlayerInDash = false;
@@ -257,47 +256,33 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 	}
 	if (playerCurrentState == INDASH) return;
 	
-	 
 	//moving direction
-	//
-	//camera.rotation.y
 	if (Wkey)
 	{
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
 		isPlayerMoving = true;
-		playerModel.SetDirection(0,-1);
 		playerModel.SetRotation(90 - localcameraYrot);
-	
-
-
+		//Diagonal
 		if(Akey) playerModel.SetRotation(135 - localcameraYrot);
 		else if(Dkey) playerModel.SetRotation(45 - localcameraYrot);
-		playerModel.SetDirection(playerModel.GetRotation());
+
 	}
 	else if (Skey)
 	{
 		isPlayerMoving = true;
 		playerModel.SetSpeed(450);
 		playerModel.PlayAnimation("run", 22, true);
-		//playerModel.SetDirection(0, 1);
-
 		playerModel.SetRotation(270 - localcameraYrot );
+		//Diagonal
 		if (Akey) playerModel.SetRotation(225 - localcameraYrot);
 		else if (Dkey) playerModel.SetRotation(315 - localcameraYrot);
-		playerModel.SetDirection(playerModel.GetRotation());
 	}
-
-	 
 	else if (Akey)
 	{
 		playerModel.SetSpeed(650);
 		playerModel.PlayAnimation("run", 22, true);
-		//playerModel.SetDirection(-1,0);
 		playerModel.SetRotation(180 - localcameraYrot);
-		playerModel.SetDirection(playerModel.GetRotation());
-		//	playerModel.SetRotation(abs(localcameraYrot) - 90);
-	
 	}
 	else if (Dkey)
 	{
@@ -305,9 +290,7 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 		playerModel.PlayAnimation("run", 22, true);
 		playerModel.SetDirection(1, 0);
 		playerModel.SetRotation(0 - localcameraYrot);
-		playerModel.SetDirection(playerModel.GetRotation());
 	}
-
 	else
 	{
 		footsteps.Pause();
@@ -315,39 +298,14 @@ void Player::PlayerControl(bool Dkey, bool Akey, bool Wkey , bool Skey )
 		isPlayerMoving = false;
 		playerModel.PlayAnimation("idle", 20, true);
 	}
-	//playerModel.SetRotation(playerModel.GetDirection());
-	
-	
-	/*
-	if (Wkey)
-	{
-		playerModel.SetSpeed(650);
-		playerModel.PlayAnimation("run", 22, true);
-		isPlayerMoving = true;
-	}
-	else if (Skey)
-	{
-		isPlayerMoving = true;
-		playerModel.SetSpeed(-450);
-		playerModel.PlayAnimation("run", 22, true);
-	}
-	else {
-		isPlayerMoving = false;
-		playerModel.SetSpeed(0);
-		playerModel.PlayAnimation("idle", 22, true);
-	}
 
-	if (Akey ) { playerModel.Rotate(6); playerModel.SetDirection(playerModel.GetRotation()); }
-	if (Dkey ) { playerModel.Rotate(-6); playerModel.SetDirection(playerModel.GetRotation()); }
-	
-	playerModel.SetDirectionV(playerModel.GetRotationV());
-	*/
+	playerModel.SetDirection(playerModel.GetRotation());
 }
 
 //*** KEYBOARD EVENTS
 void Player::OnKeyDown(SDLKey sym, CVector currentMousePos)
 {
-	if (sym == SDLK_SPACE) //ROLL SKILL
+	if (sym == SDLK_SPACE && playerCurrentState == UNOCCUPIED) //ROLL SKILL
 	{
 		if (dashCoolDown < localTime && playerCurrentState != INDASH)
 		{
@@ -381,7 +339,7 @@ void Player::chargedShotHandler()
 //*** GETTING DAMAGE
 void Player::playerGettingDamage(float damage)
 {
-	return;
+	//return;  //immortality
 	if (playerPreDeahAnimation || isPlayerInvulnerable) return;
 
 	playerCurrentHp -= damage;
@@ -485,6 +443,7 @@ void Player::addLoot()
 	lootList.back()->SetPositionV(possitionsAllowed[rand() % 9]);
 	lootList.back()->SetStatus(typeOfloot);
 }
+
 //*** CREATE SHOT
 void Player::performShot()
 {
@@ -613,9 +572,9 @@ void Player::OnRButtonDown(long t)
 	}
 }
 
-
 void Player::OnRButtonUp()
 {
+	//Shoot
 	if (startChargedShotTimer != 0) // attack delay (if (playerCurrentState == INATTACK) - less relayeble
 	{	
 		playerModel.PlayAnimation("postcharge", 80, false); // just throwing animation

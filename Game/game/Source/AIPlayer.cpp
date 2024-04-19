@@ -4,8 +4,7 @@
 #include "../headers/Map.h"
 #include <math.h> 
 
-
-//*************** DELETE ***************
+//*************** WHEN DELETED ***************
 AIPlayer::~AIPlayer()
 {
 	delete AIPlayerModel;
@@ -169,7 +168,8 @@ void AIPlayer::EnemyGetDamage(float damage)
 	if (enemyCurrentHp <= 0)
 	{
 		snowBallList.clear();
-		deathSound.Play("Death.wav");
+		if (localEnemyType == 2) deathSound.Play("bossdeath.wav");
+		else deathSound.Play("Death.wav");
 		deathSound.SetVolume(50);
 		preDeahAnimation = true;
 	}
@@ -199,21 +199,21 @@ void AIPlayer::AIPlayerControl()
 	//if not moving -> Attack
 	else if (!AIPlayerModel->IsAutoMoving())
 		Attack();
-
 }
 
 void AIPlayer::Attack()
 {
 	if (attackDelay < localTime)
 	{
-		AIPlayerModel->PlayAnimation("attack", 22, true);
+		if (localGameLvl == 3 && localEnemyType == 0) AIPlayerModel->PlayAnimation("attack", 44, true); // faster friend(traitor) antack animation on 3rd lvl
+		else AIPlayerModel->PlayAnimation("attack", 22, true);
 
 		//!!!!! NOT EFFECTIVE AS IT CHECK POSSITION ALL THE TIME INSTEAD OF DOING IT ONCE (when actual attack happens), 
 		// BUT IT ROTATES ATTACK ANIMATION TOWARDS TARGET EVERY FRAME WHICH LOOK NICE!!!! 
 		
 		//finding Closest Distance
-		float closestDistance = 0;
-		float currentDist = 0;
+		float closestDistance = 0.f;
+		float currentDist = 0.f;
 		CVector targetPos = { 0,0,0 };
 
 		//compare With All AI players
@@ -241,14 +241,22 @@ void AIPlayer::Attack()
 				closestDistance = distanceToPlayer;
 				targetPos = localPlayer->playerModel.GetPositionV();
 
-
+				flyTime = closestDistance / 1000.f;// time to current pos
 				if (localPlayer->playerModel.GetSpeed() != 0)
 				{
-					flyTime = closestDistance / 1000.f;
-					// player Movement Prediction  
+					//but final pos changes , so distance will be different as well, so time will be diferent
+					/*no idea how to predict time in final pos. probably
+					if(localPlayer->playerModel.GetYVelocity() > 0 || localPlayer->playerModel.GetXVelocity() > 0)
+						flyTime = closestDistance / (1000 - localPlayer->playerModel.GetSpeed());
+					if (localPlayer->playerModel.GetYVelocity() > 0 || localPlayer->playerModel.GetXVelocity() < 0)
+						flyTime = closestDistance / (1000 + localPlayer->playerModel.GetSpeed());
+						*/
+					// player Movement Prediction
 					CVector playerMovemntNormal = CVector(localPlayer->playerModel.GetXVelocity(), localPlayer->playerModel.GetYVelocity(), localPlayer->playerModel.GetZVelocity()).Normalized();
-					CVector playerMovementPrediction = playerMovemntNormal * flyTime; // need delta time.............
+					CVector playerMovementPrediction = playerMovemntNormal * localPlayer->playerModel.GetSpeed() * flyTime;
 					targetPos += playerMovementPrediction;
+					
+
 				}
 			}
 		}
@@ -259,10 +267,11 @@ void AIPlayer::Attack()
 		//if end Of animation, throw snowball
 		if (AIPlayerModel->GetFrame() < 90) return; // attack by the end of the attack animations
 		
-		attackDelay = localTime + 3000;
-		flyTime = closestDistance / 1000.f;
+		if (localGameLvl == 3 && localEnemyType == 0) attackDelay = localTime + 1500; // faster friend(traitor) attack on 3rd lvl
+		else attackDelay = localTime + 3000;
 
 		//Shot
+		cout << flyTime << endl;
 		CModel* pShot = bullet.Clone();
 		pShot->SetPositionV(AIPlayerModel->GetPositionV() + CVector(0, 150, 0));
 		pShot->SetDirectionAndRotationToPoint(targetPos.GetX(), targetPos.GetZ());
@@ -283,7 +292,7 @@ void AIPlayer::ShotsHandler()
 		{
 			if (pShot->HitTest(mapObj))
 			{
-				pShot->Delete();
+			//	pShot->Delete();
 				continue;
 			}
 		}
@@ -396,6 +405,7 @@ void AIPlayer::AIPlayersInitPositions()
 				entityAllPos.push_back(CVector(-1156, 100, -521));
 
 				enemyDamage = 2;
+				enemyMaxHp = enemyCurrentHp = 8;
 				snowBallSize = 25.f;
 			}
 		}
@@ -418,6 +428,7 @@ void AIPlayer::AIPlayersInitPositions()
 				entityAllPos.push_back(CVector(-1777, 100, -1720));
 
 				enemyDamage = 2;
+				enemyMaxHp = enemyCurrentHp = 8;
 				snowBallSize = 25.f;
 			}
 		}
@@ -463,7 +474,6 @@ void AIPlayer::AIPlayersInitAnimations()
 	//friend
 	if (localEnemyType == 1)
 	{
-		enemyMaxHp = enemyCurrentHp = 6;
 		AIPlayerModel->AddAnimation("run", 1, 36);
 		AIPlayerModel->AddAnimation("attack", 36, 142);
 		AIPlayerModel->AddAnimation("dead", 144, 211);
@@ -472,7 +482,6 @@ void AIPlayer::AIPlayersInitAnimations()
 	//boss
 	else if (localEnemyType == 2)
 	{
-		enemyMaxHp = enemyCurrentHp = 8;
 		AIPlayerModel->AddAnimation("run", 1, 22);
 		AIPlayerModel->AddAnimation("attack", 138, 240);
 		AIPlayerModel->AddAnimation("dead", 24, 124);
