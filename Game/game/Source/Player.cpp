@@ -55,6 +55,7 @@ Player::Player()
 //*************** INIT ***************
 void Player::init(int curentGameLevel)
 {
+	localGameLvl = curentGameLevel;
 	//possition
 	if (curentGameLevel == 1)
 	{
@@ -238,7 +239,7 @@ void Player::OnRender3D(CGraphics* g)
 void Player::UpdateForCutscene(UINT32 t, CVector playerWorldPos)
 {
 	//Final Cutscene Update player animation And Dialog Box
-	UIDialogBox::OnUpdate(t, playerWorldPos);
+	UIDialogBox::OnUpdate(t, playerWorldPos, localGameLvl);
 	playerModel.Update(t);
 }
 
@@ -318,6 +319,11 @@ void Player::OnKeyDown(SDLKey sym, CVector currentMousePos)
 			playerModel.SetSpeed(0);
 		}
 	}
+}
+
+CVector Player::GetLastPos()
+{
+	return lastFramePos;
 }
 
 //*** CHARGED SHOT

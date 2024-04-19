@@ -101,7 +101,7 @@ void AIPlayer::OnUpdate(Uint32 t, Player &player, Map& map, std::vector<AIPlayer
 	AllAIPlayerList = AllAIPlayers;
 
 	//set world pos for dialog and hp
-	UIDialogBox::OnUpdate(localTime, enemypos);
+	UIDialogBox::OnUpdate(localTime, enemypos, localGameLvl);
 	hearthHP.SetPosition(enemypos.GetX() - 30, enemypos.GetY() + 30);
 
 	AIPlayerModel->Update(t);
@@ -242,21 +242,21 @@ void AIPlayer::Attack()
 				targetPos = localPlayer->playerModel.GetPositionV();
 
 				flyTime = closestDistance / 1000.f;// time to current pos
-				if (localPlayer->playerModel.GetSpeed() != 0)
+				if (localPlayer->GetLastPos() != localPlayer->playerModel.GetPositionV())
 				{
 					//but final pos changes , so distance will be different as well, so time will be diferent
-					/*no idea how to predict time in final pos. probably
+					/*no idea how to predict time in final position. 
+					probably have to get vector where i'm moving from enemy point of view and calculate flytime correctly
+					
 					if(localPlayer->playerModel.GetYVelocity() > 0 || localPlayer->playerModel.GetXVelocity() > 0)
 						flyTime = closestDistance / (1000 - localPlayer->playerModel.GetSpeed());
 					if (localPlayer->playerModel.GetYVelocity() > 0 || localPlayer->playerModel.GetXVelocity() < 0)
 						flyTime = closestDistance / (1000 + localPlayer->playerModel.GetSpeed());
-						*/
+					*/
 					// player Movement Prediction
 					CVector playerMovemntNormal = CVector(localPlayer->playerModel.GetXVelocity(), localPlayer->playerModel.GetYVelocity(), localPlayer->playerModel.GetZVelocity()).Normalized();
 					CVector playerMovementPrediction = playerMovemntNormal * localPlayer->playerModel.GetSpeed() * flyTime;
 					targetPos += playerMovementPrediction;
-					
-
 				}
 			}
 		}
@@ -335,7 +335,7 @@ void AIPlayer::initDialogues()
 	//level 2 entry Dialog Box
 	if (onStartOfTheLevel && localGameLvl == 2)
 	{
-		if (!isFriend) UIDialogBox::showBox(localEnemyIndex, 7+ localEnemyIndex, 7+ localEnemyIndex, 10000);
+		if (!isFriend) UIDialogBox::showBox(1 + localEnemyIndex, 7 + localEnemyIndex, 7 + localEnemyIndex, 10000);
 		else UIDialogBox::showBox(5, 10, 10, 10000); // friend id 5
 		onStartOfTheLevel = false;
 	}
@@ -483,8 +483,8 @@ void AIPlayer::AIPlayersInitAnimations()
 	else if (localEnemyType == 2)
 	{
 		AIPlayerModel->AddAnimation("run", 1, 22);
-		AIPlayerModel->AddAnimation("attack", 138, 240);
-		AIPlayerModel->AddAnimation("dead", 24, 124);
-		AIPlayerModel->AddAnimation("idle", 138, 155);
+		AIPlayerModel->AddAnimation("attack", 40, 144);
+		AIPlayerModel->AddAnimation("dead", 149, 258);
+		AIPlayerModel->AddAnimation("idle", 40, 57);
 	}
 }

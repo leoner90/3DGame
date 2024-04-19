@@ -43,6 +43,7 @@ public:
 	void OnRButtonUp();
 	void OnKeyDown(SDLKey sym, CVector currentMousePos);
 	
+	CVector GetLastPos();
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! GETTERS + SETTERS -> comming soon, probably! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 	CModelMd3 playerModel;
 
@@ -87,10 +88,12 @@ private:
 
 	//local variables - mirroring
 	long localTime;
-	Map* localMap;
+	int localGameLvl;
 	float localcameraYrot;
+	Map* localMap;
 	std::vector<AIPlayer*> localAllAIPlayers;
 	CVector* localMouse;
+	
 
 	//player Shots 
 	CModelList playerShots;

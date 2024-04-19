@@ -7,9 +7,9 @@ public:
 	UIDialogBox();
 
 	//Main Functions
-	void OnUpdate(long t, CVector position);
+	void OnUpdate(long t, CVector position, int curentGameLvl);
 	void OnDraw(CGraphics* g);
-
+	
 	//Show Hide Dialog Box
 	void showBox(int speakerId, int textIdStart, int textIdEnd,  float autohideBoxin  );
 	void hideBox();
@@ -30,6 +30,7 @@ private:
 	//local Variables
 	float localW, localH;
 	float localTime;
+	int localGameLvl;
 
 	//Dialog box BG
 	CSprite dialogBoxBg;

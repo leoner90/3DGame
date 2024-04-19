@@ -17,9 +17,9 @@ UIDialogBox::UIDialogBox()
 	name[0] = "Peter"; // regular enemy
 	name[1] = "Victor"; // regular enemy
 	name[2] = "Bob"; // regular enemy
-	name[3] = "Shinma (Boss)";// BOSS
+	name[3] = "Shinma";// BOSS
 	name[4] = "Leo"; // Player
-	name[5] = "Light (Friend)"; // Friend
+	name[5] = "Light"; // Friend
  
 
 	//****** TEXTS
@@ -55,8 +55,9 @@ UIDialogBox::UIDialogBox()
 
 }
 
-void UIDialogBox::OnUpdate(long t, CVector position)
+void UIDialogBox::OnUpdate(long t, CVector position, int curentGameLvl)
 {
+	localGameLvl = curentGameLvl;
 	localTime = t;
 	//Hide if hideInSec < time
 	if (hideInSec < localTime)
@@ -81,7 +82,9 @@ void UIDialogBox::OnDraw(CGraphics* g)
 		//BG
 		dialogBoxBg.Draw(g);
 		//Speaker Draw
-		font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35 , name[speaker], speaker == 5 ? CColor::DarkGreen() :CColor::DarkRed(), 18);
+		if (localGameLvl == 3) font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35, name[speaker], CColor::DarkRed(), 18);
+		else font.DrawText(dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 35, name[speaker], speaker == 5 || speaker == 4 ? CColor::DarkGreen() : CColor::DarkRed(), 18);
+
 		//Text Draw
 		TextConverter::splitTextToLines(text[dialogNumber], dialogBoxBg.GetX() - 80, dialogBoxBg.GetY() + 15, 18);
 	}
